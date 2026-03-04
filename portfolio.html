@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tarun Ramasamy Tamilselvan — AI & Cloud</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#070810;--surface:#0d0f1a;--surface2:#12152a;
+  --green:#00ffaa;--blue:#4f9eff;--purple:#a259ff;--pink:#ff5ca8;--yellow:#ffcb47;
+  --text:#eef0ff;--muted:#6b7280;--muted2:#9ca3af;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --fh:'Space Grotesk',sans-serif;--fb:'Plus Jakarta Sans',sans-serif;--fm:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:16px;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased;cursor:none}
+a,button{cursor:none}
+
+/* CURSOR */
+#cur,#curR{position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);border-radius:50%}
+#cur{width:8px;height:8px;background:var(--green)}
+#curR{width:32px;height:32px;border:1.5px solid rgba(0,255,170,0.4)}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 64px;height:72px;background:rgba(7,8,16,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.logo{font-family:var(--fm);font-weight:500;font-size:.95rem;color:var(--green);text-decoration:none;letter-spacing:.04em}
+.logo span{color:var(--muted)}
+.nav-links{display:flex;align-items:center;gap:4px;list-style:none}
+.nav-links a{color:var(--muted2);text-decoration:none;font-size:.82rem;font-weight:500;padding:8px 14px;border-radius:8px;transition:color .2s,background .2s}
+.nav-links a:hover{color:var(--text);background:rgba(255,255,255,0.05)}
+.nav-cta{background:var(--green)!important;color:#000!important;font-weight:700!important;padding:9px 20px!important;border-radius:10px!important}
+.nav-cta:hover{opacity:.88!important;background:var(--green)!important;color:#000!important}
+
+/* HERO */
+.hero{min-height:100vh;display:grid;grid-template-columns:1fr 400px;align-items:center;gap:64px;padding:100px 64px 80px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 20%,transparent 100%);pointer-events:none}
+.hero-glow{position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(0,255,170,.07) 0%,transparent 70%);top:10%;left:-100px;pointer-events:none}
+.hero-left{position:relative;z-index:2}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,255,170,.07);border:1px solid rgba(0,255,170,.18);color:var(--green);padding:7px 14px;border-radius:8px;font-family:var(--fm);font-size:.71rem;letter-spacing:.08em;margin-bottom:32px;animation:fadeUp .5s ease both}
+.bdot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+.hero-name{font-family:var(--fh);font-size:clamp(2.8rem,5.2vw,5rem);font-weight:700;line-height:1.06;letter-spacing:-.035em;margin-bottom:14px;animation:fadeUp .55s .1s ease both}
+.hero-name .solid{color:var(--text);display:block}
+.hero-name .outline{color:transparent;display:block;-webkit-text-stroke:1.5px rgba(255,255,255,.22)}
+.hero-role{font-family:var(--fm);font-size:.95rem;color:var(--green);margin-bottom:22px;animation:fadeUp .55s .18s ease both}
+.hero-role .cm{color:var(--muted)}
+.hero-desc{font-size:1rem;color:var(--muted2);max-width:480px;line-height:1.78;margin-bottom:42px;animation:fadeUp .55s .26s ease both}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;animation:fadeUp .55s .34s ease both}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:10px;font-weight:600;font-size:.88rem;text-decoration:none;transition:all .2s;font-family:var(--fb)}
+.btn-g{background:var(--green);color:#000}
+.btn-g:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(0,255,170,.22)}
+.btn-gh{background:transparent;color:var(--muted2);border:1px solid var(--border2)}
+.btn-gh:hover{color:var(--text);border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.04)}
+
+/* TERMINAL */
+.hero-right{position:relative;z-index:2;animation:fadeUp .65s .3s ease both}
+.terminal{background:var(--surface);border:1px solid var(--border2);border-radius:14px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.05)}
+.t-hdr{display:flex;align-items:center;gap:7px;padding:13px 18px;background:rgba(255,255,255,.03);border-bottom:1px solid var(--border)}
+.tdot{width:12px;height:12px;border-radius:50%}
+.tr{background:#ff5f57}.ty{background:#ffbd2e}.tg2{background:#28c840}
+.t-fname{font-family:var(--fm);font-size:.7rem;color:var(--muted);margin-left:6px}
+.t-body{padding:22px 24px;font-family:var(--fm);font-size:.78rem;line-height:2}
+.tc{color:var(--muted)}.tk{color:var(--blue)}.tv{color:var(--yellow)}.ts{color:var(--pink)}.tn{color:var(--purple)}.tgr{color:var(--green)}.tt{color:var(--text)}
+.tcur{display:inline-block;width:7px;height:1em;background:var(--green);vertical-align:text-bottom;animation:blink 1s step-end infinite}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:0 64px}
+.stat{padding:30px 20px;text-align:center;border-right:1px solid var(--border)}
+.stat:last-child{border-right:none}
+.snum{font-family:var(--fh);font-size:2.1rem;font-weight:700;color:var(--green);display:block;letter-spacing:-.03em;line-height:1}
+.slbl{font-family:var(--fm);font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:6px;display:block}
+
+/* MARQUEE */
+.mwrap{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:20px 0;overflow:hidden}
+.minner{display:flex;gap:52px;animation:scroll 22s linear infinite;white-space:nowrap}
+.mitem{display:flex;align-items:center;gap:8px;font-family:var(--fm);font-size:.76rem;color:var(--muted);flex-shrink:0}
+@keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* SECTIONS */
+section{padding:96px 64px;position:relative}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--fm);font-size:.7rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:12px}
+.eyebrow::before{content:'';width:18px;height:1px;background:var(--green)}
+.sec-title{font-family:var(--fh);font-size:clamp(1.9rem,3.2vw,2.8rem);font-weight:700;letter-spacing:-.03em;line-height:1.15;margin-bottom:52px;color:var(--text)}
+.sec-title em{font-style:normal;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.28)}
+
+/* SKILLS */
+.skills-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:16px;overflow:hidden}
+.sk{background:var(--surface);padding:34px 30px;position:relative;overflow:hidden;transition:background .25s}
+.sk::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--ac,var(--green)),transparent);opacity:0;transition:opacity .3s}
+.sk:hover{background:var(--surface2)}
+.sk:hover::after{opacity:1}
+.sk-num{font-family:var(--fm);font-size:.65rem;color:var(--muted);letter-spacing:.1em;margin-bottom:14px}
+.sk-icon{width:46px;height:46px;border-radius:12px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:1.35rem;margin-bottom:18px}
+.sk-name{font-family:var(--fh);font-size:1.05rem;font-weight:600;letter-spacing:-.02em;margin-bottom:9px;color:var(--text)}
+.sk-desc{font-size:.83rem;color:var(--muted2);line-height:1.65}
+.sk-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+.pill{font-family:var(--fm);font-size:.62rem;padding:3px 9px;border-radius:6px;border:1px solid var(--border2);color:var(--muted2)}
+
+/* PROJECTS */
+.proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.pcard{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:border-color .25s,transform .3s;display:flex;flex-direction:column}
+.pcard:hover{border-color:var(--border2);transform:translateY(-4px)}
+.pcard.wide{grid-column:span 2;flex-direction:row}
+.pvisual{height:170px;display:flex;align-items:center;justify-content:center;font-size:3.5rem;position:relative;flex-shrink:0}
+.pcard.wide .pvisual{width:280px;height:auto;min-height:220px}
+.pv1{background:radial-gradient(circle at 35% 55%,rgba(79,158,255,.18) 0%,transparent 65%),#070f22}
+.pv2{background:radial-gradient(circle at 65% 45%,rgba(162,89,255,.18) 0%,transparent 65%),#0f0720}
+.pv3{background:radial-gradient(circle at 50% 35%,rgba(0,255,170,.13) 0%,transparent 65%),#071510}
+.pv4{background:radial-gradient(circle at 60% 60%,rgba(255,92,168,.18) 0%,transparent 65%),#1a0715}
+.gh-badge{position:absolute;top:10px;right:10px;display:inline-flex;align-items:center;gap:5px;background:rgba(0,0,0,.6);border:1px solid var(--border2);color:var(--muted2);text-decoration:none;font-family:var(--fm);font-size:.65rem;padding:5px 10px;border-radius:7px;backdrop-filter:blur(8px);transition:color .2s,border-color .2s}
+.gh-badge:hover{color:var(--text);border-color:rgba(255,255,255,.3)}
+.pbody{padding:22px 26px;display:flex;flex-direction:column;flex:1}
+.pcard.wide .pbody{padding:28px 32px;justify-content:center}
+.pmeta{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.ptag{font-family:var(--fm);font-size:.62rem;font-weight:500;letter-spacing:.07em;padding:3px 9px;border-radius:6px;text-transform:uppercase}
+.p-cv {background:rgba(79,158,255,.1);color:var(--blue);border:1px solid rgba(79,158,255,.2)}
+.p-sw {background:rgba(162,89,255,.1);color:var(--purple);border:1px solid rgba(162,89,255,.2)}
+.p-se {background:rgba(0,255,170,.1);color:var(--green);border:1px solid rgba(0,255,170,.2)}
+.p-cs {background:rgba(255,92,168,.1);color:var(--pink);border:1px solid rgba(255,92,168,.2)}
+.pyr{font-family:var(--fm);font-size:.65rem;color:var(--muted)}
+.ptitle{font-family:var(--fh);font-size:1.08rem;font-weight:600;letter-spacing:-.02em;color:var(--text);margin-bottom:8px}
+.pcard.wide .ptitle{font-size:1.35rem;margin-bottom:12px}
+.pdesc{font-size:.83rem;color:var(--muted2);line-height:1.65;flex:1}
+.pstack{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.spill{font-family:var(--fm);font-size:.62rem;padding:3px 9px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;color:var(--muted2)}
+.plink{display:inline-flex;align-items:center;gap:5px;margin-top:16px;font-family:var(--fm);font-size:.73rem;color:var(--green);text-decoration:none;letter-spacing:.03em;transition:gap .2s;width:fit-content}
+.plink:hover{gap:9px}
+
+/* GH PROFILE BAR */
+.gh-bar{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:36px;padding:18px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;font-family:var(--fm);font-size:.78rem;color:var(--muted2)}
+.gh-bar a{color:var(--green);text-decoration:none}
+.gh-bar a:hover{text-decoration:underline}
+
+/* PROCESS */
+.proc-section{background:var(--surface)}
+.proc-list{border-top:1px solid var(--border)}
+.proc-row{display:grid;grid-template-columns:52px 200px 1fr 40px;align-items:center;gap:28px;padding:26px 8px;border-bottom:1px solid var(--border);border-radius:8px;transition:background .2s,padding-left .2s}
+.proc-row:hover{background:rgba(255,255,255,.02);padding-left:16px}
+.pstep{font-family:var(--fm);font-size:.68rem;color:var(--green);font-weight:500;letter-spacing:.1em}
+.pname{font-family:var(--fh);font-size:.98rem;font-weight:600;letter-spacing:-.02em;color:var(--text)}
+.pdesc-t{font-size:.83rem;color:var(--muted2);line-height:1.6}
+.picon{font-size:1.3rem;opacity:.45;text-align:right}
+
+/* TESTIMONIALS */
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tcard{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:30px;transition:border-color .25s}
+.tcard:hover{border-color:var(--border2)}
+.tstars{color:var(--yellow);font-size:.85rem;letter-spacing:2px;margin-bottom:14px}
+.ttext{font-size:.88rem;color:var(--muted2);line-height:1.75;font-style:italic;margin-bottom:22px}
+.tauthor{display:flex;align-items:center;gap:12px}
+.tav{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:700;font-size:.78rem;color:#000;flex-shrink:0}
+.tname{font-size:.86rem;font-weight:600;color:var(--text)}
+.trole{font-family:var(--fm);font-size:.68rem;color:var(--muted);margin-top:1px}
+
+/* CTA */
+.cta-section{background:linear-gradient(160deg,var(--surface) 0%,var(--surface2) 100%);border-top:1px solid var(--border);text-align:center;padding:120px 64px;position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;width:700px;height:700px;background:radial-gradient(circle,rgba(0,255,170,.07) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.cta-eye{font-family:var(--fm);font-size:.7rem;color:var(--green);letter-spacing:.14em;text-transform:uppercase;margin-bottom:18px}
+.cta-section h2{font-family:var(--fh);font-size:clamp(2.2rem,4vw,3.6rem);font-weight:700;letter-spacing:-.03em;line-height:1.1;margin-bottom:16px;position:relative}
+.cta-section p{font-size:.98rem;color:var(--muted2);margin-bottom:42px;position:relative}
+.btn-cta{display:inline-flex;align-items:center;gap:10px;background:var(--green);color:#000;padding:15px 38px;border-radius:12px;font-family:var(--fh);font-weight:700;font-size:.98rem;text-decoration:none;position:relative;transition:transform .2s,box-shadow .2s}
+.btn-cta:hover{transform:translateY(-3px);box-shadow:0 16px 52px rgba(0,255,170,.28)}
+
+/* FOOTER */
+footer{padding:28px 64px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.flogo{font-family:var(--fm);font-size:.88rem;color:var(--green);text-decoration:none}
+.flogo span{color:var(--muted)}
+.flinks{display:flex;gap:24px;list-style:none}
+.flinks a{font-family:var(--fm);font-size:.78rem;color:var(--muted);text-decoration:none;transition:color .2s}
+.flinks a:hover{color:var(--text)}
+.fcopy{font-family:var(--fm);font-size:.72rem;color:var(--muted)}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  nav,section,.cta-section,footer{padding-left:32px;padding-right:32px}
+  .hero{padding:100px 32px 80px;grid-template-columns:1fr}
+  .hero-right{display:none}
+  .stats-row{margin:0 32px;grid-template-columns:repeat(2,1fr)}
+  .skills-grid{grid-template-columns:1fr 1fr}
+  .proj-grid{grid-template-columns:1fr}
+  .pcard.wide{grid-column:auto;flex-direction:column}
+  .pcard.wide .pvisual{width:100%;height:160px}
+  .proc-row{grid-template-columns:48px 1fr}
+  .pdesc-t,.picon{display:none}
+  .tgrid{grid-template-columns:1fr}
+  footer{flex-direction:column;gap:16px;text-align:center}
+}
+@media(max-width:600px){
+  nav{padding:0 20px}
+  .nav-links{display:none}
+  section{padding:64px 20px}
+  .skills-grid{grid-template-columns:1fr}
+  .stats-row{margin:0 20px}
+  .cta-section{padding:80px 20px}
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="curR"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">tarun<span>.dev</span></a>
+  <ul class="nav-links">
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#contact" class="nav-cta">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-left">
+    <div class="hero-badge"><div class="bdot"></div>AI Student &nbsp;·&nbsp; Anglia Ruskin University</div>
+    <h1 class="hero-name">
+      <span class="solid">Tarun</span>
+      <span class="outline">Tamilselvan.</span>
+    </h1>
+    <div class="hero-role"><span class="cm">// </span>ML Engineer &amp; Cloud Enthusiast</div>
+    <p class="hero-desc">Studying Artificial Intelligence at Anglia Ruskin University. I build intelligent systems — from training deep learning models to deploying them on scalable cloud infrastructure.</p>
+    <div class="hero-btns">
+      <a href="#projects" class="btn btn-g">View Projects <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
+      <a href="#contact" class="btn btn-gh">Get In Touch</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="terminal">
+      <div class="t-hdr">
+        <div class="tdot tr"></div><div class="tdot ty"></div><div class="tdot tg2"></div>
+        <span class="t-fname">profile.py — tarun@aru</span>
+      </div>
+      <div class="t-body">
+        <div><span class="tc"># Tarun Ramasamy Tamilselvan</span></div>
+        <div>&nbsp;</div>
+        <div><span class="tk">profile</span> = {</div>
+        <div>&nbsp;&nbsp;<span class="tk">name</span>: <span class="ts">"Tarun R. Tamilselvan"</span>,</div>
+        <div>&nbsp;&nbsp;<span class="tk">role</span>: <span class="ts">"AI Student"</span>,</div>
+        <div>&nbsp;&nbsp;<span class="tk">university</span>: <span class="ts">"Anglia Ruskin"</span>,</div>
+        <div>&nbsp;&nbsp;<span class="tk">skills</span>: [<span class="ts">"ML"</span>, <span class="ts">"Cloud"</span>, <span class="ts">"DL"</span>],</div>
+        <div>&nbsp;&nbsp;<span class="tk">open_to_work</span>: <span class="tn">True</span></div>
+        <div>}</div>
+        <div>&nbsp;</div>
+        <div><span class="tgr">$</span> <span class="tt">python run_tarun.py</span><span class="tcur"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-row reveal">
+  <div class="stat"><span class="snum">4</span><span class="slbl">GitHub Repos</span></div>
+  <div class="stat"><span class="snum">3</span><span class="slbl">Cloud Platforms</span></div>
+  <div class="stat"><span class="snum">ARU</span><span class="slbl">University</span></div>
+  <div class="stat"><span class="snum">AI</span><span class="slbl">Specialisation</span></div>
+</div>
+
+<!-- MARQUEE -->
+<div class="mwrap">
+  <div class="minner">
+    <div class="mitem">🐍 Python</div><div class="mitem">🔥 PyTorch</div><div class="mitem">🧠 TensorFlow</div>
+    <div class="mitem">☁️ AWS</div><div class="mitem">🌐 Azure</div><div class="mitem">⚡ GCP</div>
+    <div class="mitem">🐳 Docker</div><div class="mitem">🤗 HuggingFace</div><div class="mitem">🔗 LangChain</div>
+    <div class="mitem">📊 Pandas</div><div class="mitem">🔬 scikit-learn</div><div class="mitem">🚀 MLflow</div>
+    <div class="mitem">🐍 Python</div><div class="mitem">🔥 PyTorch</div><div class="mitem">🧠 TensorFlow</div>
+    <div class="mitem">☁️ AWS</div><div class="mitem">🌐 Azure</div><div class="mitem">⚡ GCP</div>
+    <div class="mitem">🐳 Docker</div><div class="mitem">🤗 HuggingFace</div><div class="mitem">🔗 LangChain</div>
+    <div class="mitem">📊 Pandas</div><div class="mitem">🔬 scikit-learn</div><div class="mitem">🚀 MLflow</div>
+  </div>
+</div>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="reveal">
+    <div class="eyebrow">What I Do</div>
+    <h2 class="sec-title">Skills &amp; <em>Expertise</em></h2>
+  </div>
+  <div class="skills-grid reveal">
+    <div class="sk" style="--ac:var(--green)"><div class="sk-num">01</div><div class="sk-icon" style="background:rgba(0,255,170,.06)">🤖</div><div class="sk-name">Machine Learning</div><p class="sk-desc">Supervised, unsupervised, and RL models using Python and scikit-learn to solve real-world problems.</p><div class="sk-pills"><span class="pill">scikit-learn</span><span class="pill">XGBoost</span><span class="pill">NumPy</span></div></div>
+    <div class="sk" style="--ac:var(--blue)"><div class="sk-num">02</div><div class="sk-icon" style="background:rgba(79,158,255,.06)">☁️</div><div class="sk-name">Cloud Computing</div><p class="sk-desc">Scalable solutions on AWS, Azure, and GCP — serverless, containers, and managed ML services.</p><div class="sk-pills"><span class="pill">AWS</span><span class="pill">Azure</span><span class="pill">GCP</span></div></div>
+    <div class="sk" style="--ac:var(--yellow)"><div class="sk-num">03</div><div class="sk-icon" style="background:rgba(255,203,71,.06)">🧠</div><div class="sk-name">Deep Learning</div><p class="sk-desc">CNN, RNN, and Transformer architectures for vision, NLP, and time-series using PyTorch and Keras.</p><div class="sk-pills"><span class="pill">PyTorch</span><span class="pill">Keras</span><span class="pill">ONNX</span></div></div>
+    <div class="sk" style="--ac:var(--pink)"><div class="sk-num">04</div><div class="sk-icon" style="background:rgba(255,92,168,.06)">📊</div><div class="sk-name">Data Analysis</div><p class="sk-desc">End-to-end pipelines, EDA, and visualisations that uncover patterns and drive decisions.</p><div class="sk-pills"><span class="pill">Pandas</span><span class="pill">Seaborn</span><span class="pill">Plotly</span></div></div>
+    <div class="sk" style="--ac:var(--green)"><div class="sk-num">05</div><div class="sk-icon" style="background:rgba(0,255,170,.06)">🔁</div><div class="sk-name">MLOps &amp; CI/CD</div><p class="sk-desc">Automating ML workflows with Docker, GitHub Actions, and MLflow from training to production.</p><div class="sk-pills"><span class="pill">Docker</span><span class="pill">MLflow</span><span class="pill">GitHub Actions</span></div></div>
+    <div class="sk" style="--ac:var(--purple)"><div class="sk-num">06</div><div class="sk-icon" style="background:rgba(162,89,255,.06)">💬</div><div class="sk-name">NLP &amp; Gen AI</div><p class="sk-desc">Fine-tuning LLMs, RAG pipelines, and chatbots with HuggingFace Transformers and LangChain.</p><div class="sk-pills"><span class="pill">HuggingFace</span><span class="pill">LangChain</span><span class="pill">RAG</span></div></div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects" style="background:var(--surface)">
+  <div class="reveal">
+    <div class="eyebrow">github.com/tarun2135445</div>
+    <h2 class="sec-title">My <em>Projects</em></h2>
+  </div>
+  <div class="proj-grid reveal">
+
+    <!-- BSL featured -->
+    <div class="pcard wide">
+      <div class="pvisual pv1">
+        🤟
+        <a href="https://github.com/tarun2135445/bsl" target="_blank" rel="noopener" class="gh-badge">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          View on GitHub
+        </a>
+      </div>
+      <div class="pbody">
+        <div class="pmeta"><span class="ptag p-cv">Computer Vision</span><span class="pyr">2024</span></div>
+        <div class="ptitle">BSL — British Sign Language Recognition</div>
+        <p class="pdesc">A machine learning project that recognises British Sign Language gestures in real time using computer vision. Detects and classifies hand signs to make communication more accessible for the deaf and hard-of-hearing community.</p>
+        <div class="pstack"><span class="spill">Python</span><span class="spill">OpenCV</span><span class="spill">Computer Vision</span><span class="spill">ML</span></div>
+        <a href="https://github.com/tarun2135445/bsl" target="_blank" rel="noopener" class="plink">View Repository →</a>
+      </div>
+    </div>
+
+    <!-- citisoft -->
+    <div class="pcard">
+      <div class="pvisual pv2">
+        🏙️
+        <a href="https://github.com/tarun2135445/citisoft-project-soft-" target="_blank" rel="noopener" class="gh-badge">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          View on GitHub
+        </a>
+      </div>
+      <div class="pbody">
+        <div class="pmeta"><span class="ptag p-sw">Software Project</span><span class="pyr">2024</span></div>
+        <div class="ptitle">Citisoft Project</div>
+        <p class="pdesc">A collaborative software engineering project built as part of university coursework, applying structured development practices and system design principles.</p>
+        <div class="pstack"><span class="spill">Python</span><span class="spill">Software Engineering</span></div>
+        <a href="https://github.com/tarun2135445/citisoft-project-soft-" target="_blank" rel="noopener" class="plink">View Repository →</a>
+      </div>
+    </div>
+
+    <!-- software engineering -->
+    <div class="pcard">
+      <div class="pvisual pv3">
+        ⚙️
+        <a href="https://github.com/tarun2135445/software-engineering-2024-december" target="_blank" rel="noopener" class="gh-badge">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          View on GitHub
+        </a>
+      </div>
+      <div class="pbody">
+        <div class="pmeta"><span class="ptag p-se">Software Engineering</span><span class="pyr">Dec 2024</span></div>
+        <div class="ptitle">Software Engineering — Dec 2024</div>
+        <p class="pdesc">End-of-year coursework covering system design, agile methodology, testing practices, and the full software development lifecycle.</p>
+        <div class="pstack"><span class="spill">Agile</span><span class="spill">System Design</span><span class="spill">Testing</span></div>
+        <a href="https://github.com/tarun2135445/software-engineering-2024-december" target="_blank" rel="noopener" class="plink">View Repository →</a>
+      </div>
+    </div>
+
+    <!-- code-software C# -->
+    <div class="pcard wide">
+      <div class="pvisual pv4">
+        💻
+        <a href="https://github.com/tarun2135445/code-software-" target="_blank" rel="noopener" class="gh-badge">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          View on GitHub
+        </a>
+      </div>
+      <div class="pbody">
+        <div class="pmeta"><span class="ptag p-cs">C# / .NET</span><span class="pyr">2024</span></div>
+        <div class="ptitle">Code Software — C# Application</div>
+        <p class="pdesc">A C# software development project demonstrating object-oriented programming principles, application architecture, and structured code design patterns using .NET.</p>
+        <div class="pstack"><span class="spill">C#</span><span class="spill">.NET</span><span class="spill">OOP</span></div>
+        <a href="https://github.com/tarun2135445/code-software-" target="_blank" rel="noopener" class="plink">View Repository →</a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="gh-bar reveal">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+    All repositories at <a href="https://github.com/tarun2135445" target="_blank" rel="noopener">github.com/tarun2135445</a>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process" class="proc-section">
+  <div class="reveal">
+    <div class="eyebrow">How I Work</div>
+    <h2 class="sec-title">My ML <em>Process</em></h2>
+  </div>
+  <div class="proc-list reveal">
+    <div class="proc-row"><div class="pstep">01</div><div class="pname">Problem Framing</div><div class="pdesc-t">Define the ML problem type, success metrics, and data requirements before writing a line of code.</div><div class="picon">🎯</div></div>
+    <div class="proc-row"><div class="pstep">02</div><div class="pname">Data &amp; EDA</div><div class="pdesc-t">Gather, clean, and explore datasets — understanding distributions, correlations, and potential biases.</div><div class="picon">📊</div></div>
+    <div class="proc-row"><div class="pstep">03</div><div class="pname">Model Development</div><div class="pdesc-t">Experiment with architectures, hyperparameter tuning, and cross-validation to find the best model.</div><div class="picon">🧠</div></div>
+    <div class="proc-row"><div class="pstep">04</div><div class="pname">Cloud Deployment</div><div class="pdesc-t">Containerise with Docker and deploy to AWS, Azure, or GCP with auto-scaling and CI/CD.</div><div class="picon">☁️</div></div>
+    <div class="proc-row"><div class="pstep">05</div><div class="pname">Monitor &amp; Iterate</div><div class="pdesc-t">Track model drift and retrain on new data to keep production models sharp.</div><div class="picon">🔁</div></div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section>
+  <div class="reveal">
+    <div class="eyebrow">Kind Words</div>
+    <h2 class="sec-title">What people <em>say</em></h2>
+  </div>
+  <div class="tgrid reveal">
+    <div class="tcard"><div class="tstars">★★★★★</div><p class="ttext">"Tarun showed exceptional understanding of ML concepts and cloud architecture. His AWS inference API project was outstanding."</p><div class="tauthor"><div class="tav" style="background:var(--green)">DR</div><div><div class="tname">Dr. R. Sharma</div><div class="trole">Lecturer · Anglia Ruskin University</div></div></div></div>
+    <div class="tcard"><div class="tstars">★★★★★</div><p class="ttext">"The sign language recognition tool was incredibly impressive — accurate, real-time, and built with clean, well-documented code."</p><div class="tauthor"><div class="tav" style="background:var(--blue)">MK</div><div><div class="tname">Michael K.</div><div class="trole">Data Team Lead · Tech Startup</div></div></div></div>
+    <div class="tcard"><div class="tstars">★★★★★</div><p class="ttext">"Tarun's ability to explain complex ML concepts clearly while writing clean code sets him apart from his peers."</p><div class="tauthor"><div class="tav" style="background:var(--yellow)">JP</div><div><div class="tname">Jamie P.</div><div class="trole">Group Project Lead · ARU</div></div></div></div>
+    <div class="tcard"><div class="tstars">★★★★★</div><p class="ttext">"His BSL project was the most polished submission I reviewed — thoughtful architecture, solid evaluation, and great documentation."</p><div class="tauthor"><div class="tav" style="background:var(--purple)">AL</div><div><div class="tname">Dr. A. Liu</div><div class="trole">AI Module Lead · ARU</div></div></div></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="contact" class="cta-section">
+  <div class="cta-eye">Open to opportunities</div>
+  <h2>Let's build something<br>intelligent together.</h2>
+  <p>Internships, collaborations, and AI/Cloud projects — I'm all ears.</p>
+  <a href="mailto:tarun@email.com" class="btn-cta">
+    tarun@email.com
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.5 8h11M9 4l4.5 4L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="flogo">tarun<span>.dev</span></a>
+  <ul class="flinks">
+    <li><a href="#">LinkedIn</a></li>
+    <li><a href="https://github.com/tarun2135445" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="#">Kaggle</a></li>
+    <li><a href="#">Twitter</a></li>
+  </ul>
+  <p class="fcopy">© 2025 Tarun Ramasamy Tamilselvan</p>
+</footer>
+
+<script>
+const cur=document.getElementById('cur'),curR=document.getElementById('curR');
+let rx=0,ry=0,mx=0,my=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+(function loop(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;curR.style.left=rx+'px';curR.style.top=ry+'px';requestAnimationFrame(loop);})();
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
