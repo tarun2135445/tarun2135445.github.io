@@ -191,7 +191,7 @@ footer{padding:28px 64px;border-top:1px solid var(--border);display:flex;align-i
     <p class="hero-desc">Studying Artificial Intelligence at Anglia Ruskin University. I build intelligent systems — from training deep learning models to deploying them on scalable cloud infrastructure.</p>
     <div class="hero-btns">
       <a href="#projects" class="btn btn-g">View Projects <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
-      <a href="#contact" class="btn btn-gh" onclick="window.location.href='ma'+'il'+'to:'+atob('VGFydW5ydEBob3RtYWlsLmNvbQ==');return false;">Get In Touch</a>
+      <a href="mailto:Tarunrt@hotmail.com" class="btn btn-gh">Get In Touch</a>
     </div>
   </div>
   <div class="hero-right">
@@ -205,7 +205,7 @@ footer{padding:28px 64px;border-top:1px solid var(--border);display:flex;align-i
         <div>&nbsp;&nbsp;<span class="tk">role</span>: <span class="ts">"AI Student"</span>,</div>
         <div>&nbsp;&nbsp;<span class="tk">university</span>: <span class="ts">"Anglia Ruskin"</span>,</div>
         <div>&nbsp;&nbsp;<span class="tk">skills</span>: [<span class="ts">"ML"</span>, <span class="ts">"Cloud"</span>, <span class="ts">"DL"</span>],</div>
-        <div>&nbsp;&nbsp;<span class="tk">email</span>: <span class="ts" id="term-email">"..."</span>,</div>
+        <div>&nbsp;&nbsp;<span class="tk">email</span>: <span class="ts">"Tarunrt@hotmail.com"</span>,</div>
         <div>&nbsp;&nbsp;<span class="tk">open_to_work</span>: <span class="tn">True</span></div>
         <div>}</div>
         <div>&nbsp;</div>
@@ -335,7 +335,8 @@ footer{padding:28px 64px;border-top:1px solid var(--border);display:flex;align-i
   <div class="cta-eye">Open to opportunities</div>
   <h2>Let's build something<br>intelligent together.</h2>
   <p>Internships, collaborations, and AI/Cloud projects — I'm all ears.</p>
-  <a href="#" onclick="window.location.href='ma'+'il'+'to:'+atob('VGFydW5ydEBob3RtYWlsLmNvbQ==');return false;" class="btn-cta" id="cta-email-btn">Tarunrt@hotmail.com
+  <a href="mailto:Tarunrt@hotmail.com" class="btn-cta">
+    Tarunrt@hotmail.com
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.5 8h11M9 4l4.5 4L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </a>
 </section>
@@ -345,7 +346,7 @@ footer{padding:28px 64px;border-top:1px solid var(--border);display:flex;align-i
     <li><a href="https://www.linkedin.com/in/tarun2135445" target="_blank" rel="noopener">LinkedIn</a></li>
     <li><a href="https://github.com/tarun2135445" target="_blank" rel="noopener">GitHub</a></li>
     <li><a href="https://www.kaggle.com/tarun2135445" target="_blank" rel="noopener">Kaggle</a></li>
-    <li><a href="#" onclick="window.location.href='ma'+'il'+'to:'+atob('VGFydW5ydEBob3RtYWlsLmNvbQ==');return false;">Email</a></li>
+    <li><a href="mailto:Tarunrt@hotmail.com">Email</a></li>
   </ul>
   <p class="fcopy">© 2025 Tarun Ramasamy Tamilselvan</p>
 </footer>
@@ -353,4 +354,10 @@ footer{padding:28px 64px;border-top:1px solid var(--border);display:flex;align-i
 const cur=document.getElementById('cur'),curR=document.getElementById('curR');
 let rx=0,ry=0,mx=window.innerWidth/2,my=window.innerHeight/2;
 document.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
-(function loop(){rx+=(mx-rx)*.1;
+(function loop(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;curR.style.left=rx+'px';curR.style.top=ry+'px';requestAnimationFrame(loop);})();
+document.querySelectorAll('.reveal').forEach(function(el){el.classList.add('visible');});
+var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');}});},{threshold:0.05});
+document.querySelectorAll('.reveal').forEach(function(el){obs.observe(el);});
+</script>
+</body>
+</html>
