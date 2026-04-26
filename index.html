@@ -70,6 +70,34 @@ nav.scrolled{box-shadow:0 4px 32px rgba(0,0,0,.4)}
 .tc{color:var(--muted)}.tk{color:var(--blue)}.ts{color:var(--pink)}.tn{color:var(--purple)}.tgr{color:var(--green)}.tt{color:var(--text)}
 .tcur{display:inline-block;width:7px;height:1em;background:var(--green);vertical-align:text-bottom;animation:blink 1s step-end infinite}
 
+/* SCROLL EXPAND MEDIA */
+.scroll-expand{position:relative;min-height:225vh;padding:0;z-index:1;background:#04050b;overflow:clip}
+.scroll-expand-pin{position:sticky;top:0;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:92px 64px 54px;overflow:hidden}
+.scroll-expand-bg{position:absolute;inset:0;z-index:0;opacity:1;transition:opacity .12s linear}
+.scroll-expand-bg img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;filter:saturate(.95) contrast(1.08)}
+.scroll-expand-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,5,11,.2),rgba(4,5,11,.6)),rgba(0,0,0,.1)}
+.scroll-expand-frame{position:absolute;top:50%;left:50%;z-index:1;transform:translate(-50%,-50%);width:300px;height:400px;max-width:95vw;max-height:85vh;border-radius:18px;overflow:visible;box-shadow:0 0 50px rgba(0,0,0,.35);will-change:width,height}
+.scroll-expand-media-wrap{position:relative;width:100%;height:100%;overflow:hidden;border-radius:16px;background:var(--surface);border:1px solid rgba(255,255,255,.12)}
+.scroll-expand-media-wrap img,.scroll-expand-media-wrap video{width:100%;height:100%;object-fit:cover;display:block}
+.scroll-expand-overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);transition:opacity .12s linear;pointer-events:none}
+.scroll-expand-scan{position:absolute;inset:0;background:linear-gradient(110deg,transparent 0%,rgba(0,255,170,.13) 42%,transparent 58%);mix-blend-mode:screen;opacity:.35;transform:translateX(-45%);animation:scanSweep 5.8s ease-in-out infinite;pointer-events:none}
+.scroll-expand-meta{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;margin-top:16px;font-family:var(--fm);position:relative;z-index:3}
+.scroll-expand-date,.scroll-expand-hint{color:#bfe8ff;text-shadow:0 8px 28px rgba(0,0,0,.7);transition:opacity .16s linear,transform .12s linear}
+.scroll-expand-date{font-size:1.25rem;font-family:var(--fh);font-weight:600;letter-spacing:0}
+.scroll-expand-hint{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase}
+.scroll-expand-title{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;width:100%;pointer-events:none;mix-blend-mode:difference}
+.scroll-expand-title span{display:block;font-family:var(--fh);font-size:clamp(2.7rem,7vw,6.6rem);font-weight:700;line-height:.95;letter-spacing:0;color:#d8ecff;text-shadow:0 20px 70px rgba(0,0,0,.45);will-change:transform}
+.scroll-expand-content{position:absolute;left:50%;bottom:44px;z-index:4;width:min(980px,calc(100% - 128px));display:grid;grid-template-columns:1.05fr repeat(3,1fr);gap:12px;align-items:stretch;opacity:0;transform:translate(-50%,24px);transition:opacity .22s linear,transform .22s ease;pointer-events:none}
+.scroll-expand.is-content-visible .scroll-expand-content{pointer-events:auto}
+.scroll-expand-copy{padding:22px 24px;border:1px solid var(--border2);border-radius:14px;background:rgba(7,8,16,.72);backdrop-filter:blur(18px)}
+.scroll-expand-copy .eyebrow{margin-bottom:8px}
+.scroll-expand-copy h2{font-family:var(--fh);font-size:1.45rem;line-height:1.12;letter-spacing:0;margin-bottom:9px}
+.scroll-expand-copy p{font-size:.84rem;color:var(--muted2);line-height:1.68}
+.scroll-expand-chip{padding:18px;border:1px solid var(--border);border-radius:14px;background:rgba(13,15,26,.72);backdrop-filter:blur(18px)}
+.scroll-expand-chip strong{display:block;font-family:var(--fm);font-size:.68rem;color:var(--green);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.scroll-expand-chip span{display:block;font-size:.82rem;color:var(--muted2);line-height:1.55}
+@keyframes scanSweep{0%,100%{transform:translateX(-50%);opacity:.08}45%,55%{transform:translateX(50%);opacity:.35}}
+
 /* STATS */
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:0 64px;position:relative;z-index:1}
 .stat{padding:30px 20px;text-align:center;border-right:1px solid var(--border);position:relative;overflow:hidden}
@@ -229,6 +257,9 @@ footer{padding:28px 64px;border-top:1px solid var(--border);display:flex;align-i
   nav,section,.cta-section,footer{padding-left:32px;padding-right:32px}
   .hero{padding:100px 32px 80px;grid-template-columns:1fr}
   .hero-right{display:none}
+  .scroll-expand-pin{padding-left:32px;padding-right:32px}
+  .scroll-expand-content{width:min(760px,calc(100% - 64px));grid-template-columns:1fr 1fr}
+  .scroll-expand-copy{grid-column:span 2}
   .stats-row{margin:0 32px;grid-template-columns:repeat(2,1fr)}
   .skills-grid{grid-template-columns:1fr 1fr}
   .proj-grid{grid-template-columns:1fr}
@@ -244,9 +275,24 @@ footer{padding:28px 64px;border-top:1px solid var(--border);display:flex;align-i
   nav{padding:0 20px}
   .nav-links{display:none}
   section{padding:64px 20px}
+  .scroll-expand{min-height:205vh;padding:0}
+  .scroll-expand-pin{padding:84px 20px 32px}
+  .scroll-expand-title span{font-size:clamp(2.4rem,15vw,4.6rem)}
+  .scroll-expand-date{font-size:1rem}
+  .scroll-expand-hint{font-size:.66rem}
+  .scroll-expand-content{bottom:20px;width:calc(100% - 40px);grid-template-columns:1fr;gap:8px}
+  .scroll-expand-copy{grid-column:auto;padding:16px}
+  .scroll-expand-copy h2{font-size:1.15rem}
+  .scroll-expand-copy p,.scroll-expand-chip span{font-size:.76rem}
+  .scroll-expand-chip{padding:14px}
   .skills-grid,.certs-grid{grid-template-columns:1fr}
   .stats-row{margin:0 20px}
   .cta-section{padding:80px 20px}
+}
+@media(prefers-reduced-motion:reduce){
+  .scroll-expand{min-height:auto}
+  .scroll-expand-pin{position:relative;min-height:100dvh}
+  .scroll-expand-scan{animation:none}
 }
 </style>
 </head>
@@ -260,6 +306,7 @@ footer{padding:28px 64px;border-top:1px solid var(--border);display:flex;align-i
 <nav id="navbar">
   <a href="#" class="logo">tarun<span>.dev</span></a>
   <ul class="nav-links">
+    <li><a href="#showreel">Showreel</a></li>
     <li><a href="#skills">Skills</a></li>
     <li><a href="#projects">Projects</a></li>
     <li><a href="#certificates">Certificates</a></li>
@@ -298,6 +345,42 @@ footer{padding:28px 64px;border-top:1px solid var(--border);display:flex;align-i
         <div>&nbsp;</div>
         <div><span class="tgr">$</span> <span class="tt">python run_tarun.py</span><span class="tcur"></span></div>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="scroll-expand" id="showreel" aria-label="Scroll expandable media feature">
+  <div class="scroll-expand-pin">
+    <div class="scroll-expand-bg" data-scroll-bg>
+      <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&amp;fit=crop&amp;w=1920&amp;q=80" alt="Circuit board background">
+    </div>
+
+    <div class="scroll-expand-frame" data-scroll-frame>
+      <div class="scroll-expand-media-wrap">
+        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&amp;fit=crop&amp;w=1600&amp;q=80" alt="Analytics dashboard on a workstation">
+        <div class="scroll-expand-overlay" data-scroll-overlay></div>
+        <div class="scroll-expand-scan"></div>
+      </div>
+      <div class="scroll-expand-meta">
+        <p class="scroll-expand-date" data-scroll-date>2026 Portfolio Focus</p>
+        <p class="scroll-expand-hint" data-scroll-hint>Scroll to expand</p>
+      </div>
+    </div>
+
+    <div class="scroll-expand-title" aria-label="AI Cloud Systems">
+      <span data-scroll-title-left>AI</span>
+      <span data-scroll-title-right>Cloud Systems</span>
+    </div>
+
+    <div class="scroll-expand-content" data-scroll-content>
+      <div class="scroll-expand-copy">
+        <div class="eyebrow">Interactive Profile</div>
+        <h2>Turning model experiments into deployed cloud systems.</h2>
+        <p>I connect experimentation, deployment, and monitoring so models can move from notebooks into practical services.</p>
+      </div>
+      <div class="scroll-expand-chip"><strong>Model</strong><span>Training, evaluation, and iteration with Python, PyTorch, and TensorFlow.</span></div>
+      <div class="scroll-expand-chip"><strong>Deploy</strong><span>Containerised services and cloud infrastructure across AWS, Azure, and GCP.</span></div>
+      <div class="scroll-expand-chip"><strong>Monitor</strong><span>Practical ML workflows with metrics, drift checks, and continuous improvement.</span></div>
     </div>
   </div>
 </section>
@@ -354,7 +437,7 @@ footer{padding:28px 64px;border-top:1px solid var(--border);display:flex;align-i
       <div class="pbody"><div class="pmeta"><span class="ptag p-sw">Software Project</span><span class="pyr">2024</span></div><div class="ptitle">Citisoft Project</div><p class="pdesc">A collaborative software engineering project applying structured development practices and system design principles.</p><div class="pstack"><span class="spill">Python</span><span class="spill">Software Engineering</span></div><a href="https://github.com/tarun2135445/citisoft-project-soft-" target="_blank" rel="noopener" class="plink">View Repository →</a></div>
     </div>
     <div class="pcard reveal stagger-2">
-      <div class="pvisual pv3">⚙️<a href="https://github.com/tarun2135445/software-engineering-2024-december" target="_blank" rel="noopener" class="gh-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> GitHub</a></div>
+      <div class="pvisual pv3">⚙️<a href="https://github.com/tarun2135445/software-engineering-2024-december" target="_blank" rel="noopener" class="gh-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> GitHub</a></div>
       <div class="pbody"><div class="pmeta"><span class="ptag p-se">Software Engineering</span><span class="pyr">Dec 2024</span></div><div class="ptitle">Software Engineering — Dec 2024</div><p class="pdesc">End-of-year coursework covering system design, agile methodology, testing, and the full software development lifecycle.</p><div class="pstack"><span class="spill">Agile</span><span class="spill">System Design</span><span class="spill">Testing</span></div><a href="https://github.com/tarun2135445/software-engineering-2024-december" target="_blank" rel="noopener" class="plink">View Repository →</a></div>
     </div>
     <div class="pcard wide reveal-right">
@@ -597,6 +680,70 @@ window.addEventListener('scroll',function(){
   document.getElementById('progress-bar').style.width=(s/h*100)+'%';
   document.getElementById('navbar').classList.toggle('scrolled',s>50);
 });
+
+// Scroll expand media
+(function(){
+  var section=document.querySelector('.scroll-expand');
+  if(!section) return;
+  var frame=section.querySelector('[data-scroll-frame]');
+  var bg=section.querySelector('[data-scroll-bg]');
+  var overlay=section.querySelector('[data-scroll-overlay]');
+  var date=section.querySelector('[data-scroll-date]');
+  var hint=section.querySelector('[data-scroll-hint]');
+  var titleLeft=section.querySelector('[data-scroll-title-left]');
+  var titleRight=section.querySelector('[data-scroll-title-right]');
+  var content=section.querySelector('[data-scroll-content]');
+  var reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
+  var ticking=false;
+
+  function clamp(value,min,max){return Math.min(Math.max(value,min),max);}
+  function ease(value){return value<.5?2*value*value:1-Math.pow(-2*value+2,2)/2;}
+
+  function updateScrollExpand(){
+    ticking=false;
+    var progress=1;
+
+    if(!reduceMotion.matches){
+      var rect=section.getBoundingClientRect();
+      var travel=Math.max(section.offsetHeight-window.innerHeight,1);
+      progress=clamp(-rect.top/travel,0,1);
+    }
+
+    var eased=ease(progress);
+    var isMobile=window.innerWidth<768;
+    var mediaWidth=300+eased*(isMobile?650:1250);
+    var mediaHeight=400+eased*(isMobile?200:400);
+    var textTranslateX=eased*(isMobile?180:150);
+    var contentProgress=clamp((progress-.72)/.18,0,1);
+
+    frame.style.width=mediaWidth+'px';
+    frame.style.height=mediaHeight+'px';
+    bg.style.opacity=(1-progress).toFixed(3);
+    overlay.style.opacity=(.52-progress*.32).toFixed(3);
+    titleLeft.style.transform='translateX(-'+textTranslateX+'vw)';
+    titleRight.style.transform='translateX('+textTranslateX+'vw)';
+    date.style.transform='translateX(-'+textTranslateX+'vw)';
+    hint.style.transform='translateX('+textTranslateX+'vw)';
+    date.style.opacity=(1-clamp((progress-.4)/.35,0,1)).toFixed(3);
+    hint.style.opacity=(1-clamp((progress-.4)/.35,0,1)).toFixed(3);
+    content.style.opacity=contentProgress.toFixed(3);
+    content.style.transform='translate(-50%,'+(24-contentProgress*24)+'px)';
+    section.classList.toggle('is-content-visible',contentProgress>.8);
+  }
+
+  function requestUpdate(){
+    if(ticking) return;
+    ticking=true;
+    requestAnimationFrame(updateScrollExpand);
+  }
+
+  updateScrollExpand();
+  window.addEventListener('scroll',requestUpdate,{passive:true});
+  window.addEventListener('resize',requestUpdate);
+  if(reduceMotion.addEventListener){
+    reduceMotion.addEventListener('change',requestUpdate);
+  }
+})();
 
 // Scroll reveal
 var obs=new IntersectionObserver(function(entries){
