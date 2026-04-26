@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tarun Ramasamy Tamilselvan — AI & Cloud</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js" defer></script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -497,135 +498,90 @@ footer{padding:28px 64px;border-top:1px solid var(--border);display:flex;align-i
 </footer>
 
 <script>
-// ── NEURAL NETWORK BACKGROUND ──
+// ── WEBGL SHADER BACKGROUND (chromatic scanline) ──
 (function(){
-  var canvas=document.getElementById('bg-canvas');
-  var ctx=canvas.getContext('2d');
-  var W,H,nodes=[],mouse={x:-999,y:-999};
-  var COLORS=['#00ffaa','#4f9eff','#a259ff','#ff5ca8'];
-  var NODE_COUNT=90,CONNECT_DIST=160,MOUSE_DIST=200;
+  function start(){
+    if(!window.THREE){ return setTimeout(start, 60); }
+    var canvas = document.getElementById('bg-canvas');
+    if(!canvas) return;
 
-  function resize(){
-    W=canvas.width=window.innerWidth;
-    H=canvas.height=window.innerHeight;
-  }
+    var vertexShader = [
+      'attribute vec3 position;',
+      'void main(){ gl_Position = vec4(position, 1.0); }'
+    ].join('\n');
 
-  function Node(){
-    this.x=Math.random()*W;
-    this.y=Math.random()*H;
-    this.vx=(Math.random()-.5)*.35;
-    this.vy=(Math.random()-.5)*.35;
-    this.r=Math.random()*2+1;
-    this.color=COLORS[Math.floor(Math.random()*COLORS.length)];
-    this.baseAlpha=Math.random()*.5+.2;
-    this.alpha=this.baseAlpha;
-    this.pulse=Math.random()*Math.PI*2;
-  }
+    var fragmentShader = [
+      'precision highp float;',
+      'uniform vec2 resolution;',
+      'uniform float time;',
+      'uniform float xScale;',
+      'uniform float yScale;',
+      'uniform float distortion;',
+      'void main(){',
+      '  vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);',
+      '  float d = length(p) * distortion;',
+      '  float rx = p.x * (1.0 + d);',
+      '  float gx = p.x;',
+      '  float bx = p.x * (1.0 - d);',
+      '  float r = 0.05 / abs(p.y + sin((rx + time) * xScale) * yScale);',
+      '  float g = 0.05 / abs(p.y + sin((gx + time) * xScale) * yScale);',
+      '  float b = 0.05 / abs(p.y + sin((bx + time) * xScale) * yScale);',
+      '  gl_FragColor = vec4(r, g, b, 1.0);',
+      '}'
+    ].join('\n');
 
-  Node.prototype.update=function(){
-    this.x+=this.vx;
-    this.y+=this.vy;
-    if(this.x<0||this.x>W) this.vx*=-1;
-    if(this.y<0||this.y>H) this.vy*=-1;
-    this.pulse+=0.02;
-    this.alpha=this.baseAlpha+Math.sin(this.pulse)*0.15;
-    // mouse repel
-    var dx=this.x-mouse.x, dy=this.y-mouse.y;
-    var dist=Math.sqrt(dx*dx+dy*dy);
-    if(dist<MOUSE_DIST){
-      var force=(MOUSE_DIST-dist)/MOUSE_DIST*0.8;
-      this.vx+=dx/dist*force*0.4;
-      this.vy+=dy/dist*force*0.4;
-      var maxV=2;
-      var spd=Math.sqrt(this.vx*this.vx+this.vy*this.vy);
-      if(spd>maxV){this.vx=this.vx/spd*maxV;this.vy=this.vy/spd*maxV;}
-    } else {
-      this.vx*=0.995;
-      this.vy*=0.995;
-      if(Math.abs(this.vx)<.1) this.vx+=(Math.random()-.5)*.05;
-      if(Math.abs(this.vy)<.1) this.vy+=(Math.random()-.5)*.05;
+    var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: false });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x000000, 1);
+
+    var scene = new THREE.Scene();
+    var camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, -1);
+
+    var uniforms = {
+      resolution: { value: new THREE.Vector2(1, 1) },
+      time:       { value: 0.0 },
+      xScale:     { value: 1.0 },
+      yScale:     { value: 0.5 },
+      distortion: { value: 0.05 }
+    };
+
+    var positions = new Float32Array([
+      -1,-1, 0,  1,-1, 0,  -1, 1, 0,
+       1,-1, 0, -1, 1, 0,   1, 1, 0
+    ]);
+    var geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+    var material = new THREE.RawShaderMaterial({
+      vertexShader: vertexShader,
+      fragmentShader: fragmentShader,
+      uniforms: uniforms,
+      side: THREE.DoubleSide
+    });
+
+    scene.add(new THREE.Mesh(geometry, material));
+
+    function resize(){
+      var w = window.innerWidth, h = window.innerHeight;
+      renderer.setSize(w, h, false);
+      uniforms.resolution.value.set(w, h);
     }
-  };
 
-  Node.prototype.draw=function(){
-    ctx.save();
-    ctx.globalAlpha=this.alpha;
-    ctx.shadowBlur=8;
-    ctx.shadowColor=this.color;
-    ctx.fillStyle=this.color;
-    ctx.beginPath();
-    ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
-    ctx.fill();
-    ctx.restore();
-  };
-
-  function initNodes(){
-    nodes=[];
-    for(var i=0;i<NODE_COUNT;i++) nodes.push(new Node());
-  }
-
-  function drawConnections(){
-    for(var i=0;i<nodes.length;i++){
-      for(var j=i+1;j<nodes.length;j++){
-        var dx=nodes[i].x-nodes[j].x;
-        var dy=nodes[i].y-nodes[j].y;
-        var d=Math.sqrt(dx*dx+dy*dy);
-        if(d<CONNECT_DIST){
-          var alpha=(1-d/CONNECT_DIST)*0.18;
-          // boost lines near mouse
-          var mx1=(nodes[i].x+nodes[j].x)/2-mouse.x;
-          var my1=(nodes[i].y+nodes[j].y)/2-mouse.y;
-          var md=Math.sqrt(mx1*mx1+my1*my1);
-          if(md<MOUSE_DIST) alpha+=(1-md/MOUSE_DIST)*0.35;
-          ctx.save();
-          ctx.globalAlpha=Math.min(alpha,.55);
-          var grad=ctx.createLinearGradient(nodes[i].x,nodes[i].y,nodes[j].x,nodes[j].y);
-          grad.addColorStop(0,nodes[i].color);
-          grad.addColorStop(1,nodes[j].color);
-          ctx.strokeStyle=grad;
-          ctx.lineWidth=.6;
-          ctx.shadowBlur=4;
-          ctx.shadowColor=nodes[i].color;
-          ctx.beginPath();
-          ctx.moveTo(nodes[i].x,nodes[i].y);
-          ctx.lineTo(nodes[j].x,nodes[j].y);
-          ctx.stroke();
-          ctx.restore();
-        }
-      }
-      // connect to mouse
-      var dmx=nodes[i].x-mouse.x, dmy=nodes[i].y-mouse.y;
-      var dm=Math.sqrt(dmx*dmx+dmy*dmy);
-      if(dm<MOUSE_DIST){
-        var ma=(1-dm/MOUSE_DIST)*0.6;
-        ctx.save();
-        ctx.globalAlpha=ma;
-        ctx.strokeStyle=nodes[i].color;
-        ctx.lineWidth=1;
-        ctx.shadowBlur=10;
-        ctx.shadowColor=nodes[i].color;
-        ctx.beginPath();
-        ctx.moveTo(nodes[i].x,nodes[i].y);
-        ctx.lineTo(mouse.x,mouse.y);
-        ctx.stroke();
-        ctx.restore();
-      }
+    function tick(){
+      uniforms.time.value += 0.01;
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
     }
-  }
 
-  function animate(){
-    ctx.clearRect(0,0,W,H);
-    drawConnections();
-    for(var i=0;i<nodes.length;i++){nodes[i].update();nodes[i].draw();}
-    requestAnimationFrame(animate);
+    resize();
+    tick();
+    window.addEventListener('resize', resize);
   }
-
-  window.addEventListener('resize',function(){resize();});
-  window.addEventListener('mousemove',function(e){mouse.x=e.clientX;mouse.y=e.clientY;});
-  window.addEventListener('mouseleave',function(){mouse.x=-999;mouse.y=-999;});
-  resize();
-  initNodes();
-  animate();
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', start);
+  } else {
+    start();
+  }
 })();
 
 // Cursor
@@ -671,6 +627,7 @@ for(var i=0;i<18;i++){
   p.style.opacity=Math.random()*0.4;
   pc.appendChild(p);
 }
+
 </script>
 </body>
 </html>
