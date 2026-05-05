@@ -3,175 +3,154 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tarun Ramasamy Tamilselvan — AI & Cloud</title>
+<title>Tarun Ramasamy Tamilselvan — AI &amp; Cloud</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js" defer></script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
   --bg:#070810;--surface:#0d0f1a;--surface2:#12152a;
   --green:#00ffaa;--blue:#4f9eff;--purple:#a259ff;--pink:#ff5ca8;--yellow:#ffcb47;
   --text:#eef0ff;--muted:#6b7280;--muted2:#9ca3af;
-  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);
   --fh:'Space Grotesk',sans-serif;--fb:'Plus Jakarta Sans',sans-serif;--fm:'JetBrains Mono',monospace;
 }
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:16px;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased;cursor:none}
-#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.5}
-a,button{cursor:none}
-#cur,#curR{position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);border-radius:50%;transition:transform .15s}
-#cur{width:8px;height:8px;background:var(--green)}
-#curR{width:32px;height:32px;border:1.5px solid rgba(0,255,170,0.4)}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* Ambient mesh background */
+.mesh{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.mesh .blob{position:absolute;border-radius:50%;filter:blur(110px);will-change:transform;opacity:.55;mix-blend-mode:screen}
+.mesh .b1{width:680px;height:680px;background:radial-gradient(circle,var(--green) 0%,transparent 70%);top:-180px;left:-120px;animation:drift1 22s ease-in-out infinite}
+.mesh .b2{width:580px;height:580px;background:radial-gradient(circle,var(--purple) 0%,transparent 70%);bottom:-160px;right:-120px;animation:drift2 26s ease-in-out infinite}
+.mesh .b3{width:520px;height:520px;background:radial-gradient(circle,var(--blue) 0%,transparent 70%);top:38%;left:42%;opacity:.32;animation:drift3 32s ease-in-out infinite}
+@keyframes drift1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(140px,80px) scale(1.12)}66%{transform:translate(60px,160px) scale(.95)}}
+@keyframes drift2{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-100px,-60px) scale(.92)}66%{transform:translate(-180px,40px) scale(1.08)}}
+@keyframes drift3{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-30%,-60%) scale(1.15)}}
+
+/* Aurora ribbon */
+.aurora{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;opacity:.38;mix-blend-mode:screen}
+.aurora::before{content:'';position:absolute;top:-30%;left:-20%;width:140%;height:80%;background:conic-gradient(from 0deg at 50% 50%,transparent 0deg,var(--green) 60deg,transparent 120deg,var(--purple) 220deg,transparent 280deg,var(--blue) 340deg,transparent 360deg);filter:blur(80px);animation:auroraSpin 40s linear infinite}
+@keyframes auroraSpin{to{transform:rotate(360deg)}}
+
+/* Twinkling stars */
+.stars{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.stars i{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:0;animation:twinkle 4s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:0;transform:scale(.5)}50%{opacity:.85;transform:scale(1.2)}}
+
+/* Drifting grid */
+.grid-overlay{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 20%,transparent 100%);animation:gridDrift 24s linear infinite}
+@keyframes gridDrift{from{background-position:0 0,0 0}to{background-position:64px 64px,64px 64px}}
+
+/* Mouse spotlight */
+.spotlight{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(600px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.04),transparent 40%);transition:background .15s linear}
+
+/* Progress bar */
+#progress-bar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--green),var(--blue),var(--purple),var(--green));background-size:300% 100%;width:0%;z-index:300;transition:width .1s;animation:progGrad 5s linear infinite}
+@keyframes progGrad{to{background-position:300% 0}}
 
 /* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 64px;height:72px;background:rgba(7,8,16,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);transition:box-shadow .3s}
-nav.scrolled{box-shadow:0 4px 32px rgba(0,0,0,.4)}
-.logo{font-family:var(--fm);font-weight:500;font-size:.95rem;color:var(--green);text-decoration:none;letter-spacing:.04em}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 56px;height:68px;background:rgba(7,8,16,.4);backdrop-filter:blur(20px);border-bottom:1px solid transparent;transition:background .35s,border-color .35s,height .35s}
+nav.scrolled{background:rgba(7,8,16,.78);border-bottom-color:var(--border);height:60px}
+.logo{font-family:var(--fm);font-weight:500;font-size:.92rem;color:var(--green);text-decoration:none;letter-spacing:.04em}
 .logo span{color:var(--muted)}
 .nav-links{display:flex;align-items:center;gap:4px;list-style:none}
 .nav-links a{color:var(--muted2);text-decoration:none;font-size:.82rem;font-weight:500;padding:8px 14px;border-radius:8px;transition:color .2s,background .2s}
-.nav-links a:hover{color:var(--text);background:rgba(255,255,255,0.05)}
+.nav-links a:hover{color:var(--text);background:rgba(255,255,255,.05)}
 .nav-cta{background:var(--green)!important;color:#000!important;font-weight:700!important;padding:9px 20px!important;border-radius:10px!important}
-.nav-cta:hover{opacity:.88!important}
-
-/* SCROLL PROGRESS BAR */
-#progress-bar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--green),var(--blue));width:0%;z-index:300;transition:width .1s}
 
 /* HERO */
-.hero{min-height:100vh;display:grid;grid-template-columns:1fr 400px;align-items:center;gap:64px;padding:100px 64px 80px;position:relative;overflow:hidden}
-.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 20%,transparent 100%);pointer-events:none}
-.hero-glow{position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(0,255,170,.07) 0%,transparent 70%);top:10%;left:-100px;pointer-events:none;animation:glowPulse 6s ease-in-out infinite}
-@keyframes glowPulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.1)}}
-.hero-left{position:relative;z-index:2}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,255,170,.07);border:1px solid rgba(0,255,170,.18);color:var(--green);padding:7px 14px;border-radius:8px;font-family:var(--fm);font-size:.71rem;letter-spacing:.08em;margin-bottom:32px;animation:fadeUp .5s ease both}
-.bdot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:blink 2s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
-.hero-name{font-family:var(--fh);font-size:clamp(2.8rem,5.2vw,5rem);font-weight:700;line-height:1.06;letter-spacing:-.035em;margin-bottom:14px;animation:fadeUp .55s .1s ease both}
+.hero{position:relative;z-index:2;min-height:100vh;display:grid;grid-template-columns:1fr 400px;align-items:center;gap:64px;padding:108px 56px 80px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,255,170,.07);border:1px solid rgba(0,255,170,.2);color:var(--green);padding:7px 14px;border-radius:8px;font-family:var(--fm);font-size:.7rem;letter-spacing:.08em;margin-bottom:30px;animation:fadeUp .55s ease both}
+.bdot{width:6px;height:6px;background:var(--green);border-radius:50%;box-shadow:0 0 8px var(--green);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.hero-name{font-family:var(--fh);font-size:clamp(2.8rem,5.4vw,5rem);font-weight:700;line-height:1.04;letter-spacing:-.035em;margin-bottom:14px;animation:fadeUp .55s .1s ease both}
 .hero-name .solid{color:var(--text);display:block}
-.hero-name .outline{color:transparent;display:block;-webkit-text-stroke:1.5px rgba(255,255,255,.22)}
+.hero-name .outline{color:transparent;display:block;-webkit-text-stroke:1.4px rgba(255,255,255,.24)}
+
 .hero-role{font-family:var(--fm);font-size:.95rem;color:var(--green);margin-bottom:22px;animation:fadeUp .55s .18s ease both}
 .hero-role .cm{color:var(--muted)}
-.hero-desc{font-size:1rem;color:var(--muted2);max-width:480px;line-height:1.78;margin-bottom:42px;animation:fadeUp .55s .26s ease both}
+
+.hero-desc{font-size:1rem;color:var(--muted2);max-width:480px;line-height:1.78;margin-bottom:38px;animation:fadeUp .55s .26s ease both}
+
 .hero-btns{display:flex;gap:12px;flex-wrap:wrap;animation:fadeUp .55s .34s ease both}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:10px;font-weight:600;font-size:.88rem;text-decoration:none;transition:all .2s;font-family:var(--fb)}
+.btn{position:relative;display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:10px;font-weight:600;font-size:.88rem;text-decoration:none;font-family:var(--fb);overflow:hidden;isolation:isolate;transition:transform .25s cubic-bezier(.34,1.4,.5,1),box-shadow .25s,background .25s,border-color .25s,color .25s}
+.btn svg{transition:transform .3s cubic-bezier(.34,1.4,.5,1)}
+.btn:hover svg{transform:translateX(4px)}
+.btn::before{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.32) 50%,transparent 70%);transform:translateX(-110%);transition:transform .55s ease;z-index:-1}
+.btn:hover::before{transform:translateX(110%)}
+.btn:active{transform:translateY(0) scale(.97)}
 .btn-g{background:var(--green);color:#000}
-.btn-g:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(0,255,170,.22)}
+.btn-g:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(0,255,170,.35),0 0 0 4px rgba(0,255,170,.1)}
 .btn-gh{background:transparent;color:var(--muted2);border:1px solid var(--border2)}
-.btn-gh:hover{color:var(--text);border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.04)}
+.btn-gh:hover{transform:translateY(-3px);color:var(--text);border-color:rgba(255,255,255,.32);background:rgba(255,255,255,.05)}
 
 /* TERMINAL */
 .hero-right{position:relative;z-index:2;animation:fadeUp .65s .3s ease both}
-.terminal{background:var(--surface);border:1px solid var(--border2);border-radius:14px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.55)}
+.terminal{background:rgba(13,15,26,.7);border:1px solid var(--border2);border-radius:14px;overflow:hidden;backdrop-filter:blur(12px);box-shadow:0 24px 80px rgba(0,0,0,.55)}
 .t-hdr{display:flex;align-items:center;gap:7px;padding:13px 18px;background:rgba(255,255,255,.03);border-bottom:1px solid var(--border)}
-.tdot{width:12px;height:12px;border-radius:50%}
+.tdot{width:11px;height:11px;border-radius:50%}
 .tr{background:#ff5f57}.ty{background:#ffbd2e}.tg2{background:#28c840}
 .t-fname{font-family:var(--fm);font-size:.7rem;color:var(--muted);margin-left:6px}
 .t-body{padding:22px 24px;font-family:var(--fm);font-size:.78rem;line-height:2}
 .tc{color:var(--muted)}.tk{color:var(--blue)}.ts{color:var(--pink)}.tn{color:var(--purple)}.tgr{color:var(--green)}.tt{color:var(--text)}
 .tcur{display:inline-block;width:7px;height:1em;background:var(--green);vertical-align:text-bottom;animation:blink 1s step-end infinite}
 
-/* SCROLL EXPAND MEDIA */
-.scroll-expand{position:relative;min-height:225vh;padding:0;z-index:1;background:#04050b;overflow:clip}
-.scroll-expand-pin{position:sticky;top:0;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:92px 64px 54px;overflow:hidden}
-.scroll-expand-bg{position:absolute;inset:0;z-index:0;opacity:1;transition:opacity .12s linear}
-.scroll-expand-bg img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;filter:saturate(.95) contrast(1.08)}
-.scroll-expand-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,5,11,.2),rgba(4,5,11,.6)),rgba(0,0,0,.1)}
-.scroll-expand-frame{position:absolute;top:50%;left:50%;z-index:1;transform:translate(-50%,-50%);width:300px;height:400px;max-width:95vw;max-height:85vh;border-radius:18px;overflow:visible;box-shadow:0 0 50px rgba(0,0,0,.35);will-change:width,height}
-.scroll-expand-media-wrap{position:relative;width:100%;height:100%;overflow:hidden;border-radius:16px;background:var(--surface);border:1px solid rgba(255,255,255,.12)}
-.scroll-expand-media-wrap img,.scroll-expand-media-wrap video{width:100%;height:100%;object-fit:cover;display:block}
-.scroll-expand-overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);transition:opacity .12s linear;pointer-events:none}
-.scroll-expand-scan{position:absolute;inset:0;background:linear-gradient(110deg,transparent 0%,rgba(0,255,170,.13) 42%,transparent 58%);mix-blend-mode:screen;opacity:.35;transform:translateX(-45%);animation:scanSweep 5.8s ease-in-out infinite;pointer-events:none}
-.scroll-expand-meta{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;margin-top:16px;font-family:var(--fm);position:relative;z-index:3}
-.scroll-expand-date,.scroll-expand-hint{color:#bfe8ff;text-shadow:0 8px 28px rgba(0,0,0,.7);transition:opacity .16s linear,transform .12s linear}
-.scroll-expand-date{font-size:1.25rem;font-family:var(--fh);font-weight:600;letter-spacing:0}
-.scroll-expand-hint{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase}
-.scroll-expand-title{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;width:100%;pointer-events:none;mix-blend-mode:difference}
-.scroll-expand-title span{display:block;font-family:var(--fh);font-size:clamp(2.7rem,7vw,6.6rem);font-weight:700;line-height:.95;letter-spacing:0;color:#d8ecff;text-shadow:0 20px 70px rgba(0,0,0,.45);will-change:transform}
-.scroll-expand-content{position:absolute;left:50%;bottom:44px;z-index:4;width:min(980px,calc(100% - 128px));display:grid;grid-template-columns:1.05fr repeat(3,1fr);gap:12px;align-items:stretch;opacity:0;transform:translate(-50%,24px);transition:opacity .22s linear,transform .22s ease;pointer-events:none}
-.scroll-expand.is-content-visible .scroll-expand-content{pointer-events:auto}
-.scroll-expand-copy{padding:22px 24px;border:1px solid var(--border2);border-radius:14px;background:rgba(7,8,16,.72);backdrop-filter:blur(18px)}
-.scroll-expand-copy .eyebrow{margin-bottom:8px}
-.scroll-expand-copy h2{font-family:var(--fh);font-size:1.45rem;line-height:1.12;letter-spacing:0;margin-bottom:9px}
-.scroll-expand-copy p{font-size:.84rem;color:var(--muted2);line-height:1.68}
-.scroll-expand-chip{padding:18px;border:1px solid var(--border);border-radius:14px;background:rgba(13,15,26,.72);backdrop-filter:blur(18px)}
-.scroll-expand-chip strong{display:block;font-family:var(--fm);font-size:.68rem;color:var(--green);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
-.scroll-expand-chip span{display:block;font-size:.82rem;color:var(--muted2);line-height:1.55}
-@keyframes scanSweep{0%,100%{transform:translateX(-50%);opacity:.08}45%,55%{transform:translateX(50%);opacity:.35}}
-
-/* STATS */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:0 64px;position:relative;z-index:1}
-.stat{padding:30px 20px;text-align:center;border-right:1px solid var(--border);position:relative;overflow:hidden}
-.stat:last-child{border-right:none}
-.stat::before{content:'';position:absolute;inset:0;background:var(--green);transform:scaleY(0);transform-origin:bottom;transition:transform .4s ease;opacity:.04;z-index:0}
-.stat:hover::before{transform:scaleY(1)}
-.snum{font-family:var(--fh);font-size:2.1rem;font-weight:700;color:var(--green);display:block;letter-spacing:-.03em;line-height:1;position:relative}
-.slbl{font-family:var(--fm);font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:6px;display:block;position:relative}
-
-/* MARQUEE */
-.mwrap{background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:20px 0;overflow:hidden;position:relative;z-index:1}
-.minner{display:flex;gap:52px;animation:scroll 22s linear infinite;white-space:nowrap}
-.mitem{display:flex;align-items:center;gap:8px;font-family:var(--fm);font-size:.76rem;color:var(--muted);flex-shrink:0}
-@keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
 /* SECTIONS */
-section{padding:96px 64px;position:relative;z-index:1}
-.eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--fm);font-size:.7rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:12px}
+section{padding:96px 56px;position:relative;z-index:1}
+.sec-head{margin-bottom:48px;max-width:680px}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--fm);font-size:.7rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:14px}
 .eyebrow::before{content:'';width:18px;height:1px;background:var(--green)}
-.sec-title{font-family:var(--fh);font-size:clamp(1.9rem,3.2vw,2.8rem);font-weight:700;letter-spacing:-.03em;line-height:1.15;margin-bottom:52px;color:var(--text)}
+.sec-title{font-family:var(--fh);font-size:clamp(1.9rem,3.2vw,2.8rem);font-weight:700;letter-spacing:-.03em;line-height:1.15;color:var(--text)}
 .sec-title em{font-style:normal;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.28)}
+.sec-sub{font-size:.98rem;color:var(--muted2);line-height:1.7;margin-top:14px;max-width:560px}
 
-/* SCROLL ANIMATIONS */
-.reveal{opacity:0;transform:translateY(32px);transition:opacity .7s ease,transform .7s ease}
-.reveal.visible{opacity:1;transform:translateY(0)}
-.reveal-left{opacity:0;transform:translateX(-40px);transition:opacity .7s ease,transform .7s ease}
-.reveal-left.visible{opacity:1;transform:translateX(0)}
-.reveal-right{opacity:0;transform:translateX(40px);transition:opacity .7s ease,transform .7s ease}
-.reveal-right.visible{opacity:1;transform:translateX(0)}
-.reveal-scale{opacity:0;transform:scale(.92);transition:opacity .6s ease,transform .6s ease}
-.reveal-scale.visible{opacity:1;transform:scale(1)}
-.stagger-1{transition-delay:.05s!important}
-.stagger-2{transition-delay:.12s!important}
-.stagger-3{transition-delay:.19s!important}
-.stagger-4{transition-delay:.26s!important}
-.stagger-5{transition-delay:.33s!important}
-.stagger-6{transition-delay:.40s!important}
+/* Reveal — blur-up + slide variants */
+.reveal{opacity:0;transform:translateY(36px);transition:opacity .85s cubic-bezier(.2,.7,.2,1),transform .85s cubic-bezier(.2,.7,.2,1),filter .85s ease;filter:blur(6px)}
+.reveal.visible{opacity:1;transform:translateY(0) translateX(0) scale(1);filter:blur(0)}
+.reveal-l{transform:translateX(-44px)}
+.reveal-r{transform:translateX(44px)}
+.reveal-scale{transform:scale(.94)}
+.stagger-1{transition-delay:.05s}.stagger-2{transition-delay:.13s}.stagger-3{transition-delay:.21s}
+.stagger-4{transition-delay:.29s}.stagger-5{transition-delay:.37s}.stagger-6{transition-delay:.45s}
 
-/* FLOATING PARTICLES */
-#particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.particle{position:absolute;width:2px;height:2px;background:var(--green);border-radius:50%;opacity:0;animation:particleFloat linear infinite}
-@keyframes particleFloat{0%{opacity:0;transform:translateY(100vh) scale(0)}10%{opacity:.6}90%{opacity:.2}100%{opacity:0;transform:translateY(-10vh) scale(1.5)}}
+/* Section title underline grow */
+.sec-title{position:relative;display:inline-block}
+.sec-title::after{content:'';position:absolute;left:0;bottom:-10px;width:0;height:2px;background:linear-gradient(90deg,var(--green),transparent);transition:width 1s cubic-bezier(.2,.7,.2,1) .25s}
+.reveal.visible .sec-title::after{width:80px}
 
 /* SKILLS */
-.skills-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:16px;overflow:hidden}
-.sk{background:var(--surface);padding:34px 30px;position:relative;overflow:hidden;transition:background .3s,transform .3s}
-.sk::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--ac,var(--green)),transparent);opacity:0;transition:opacity .3s}
-.sk::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.04),transparent 60%);opacity:0;transition:opacity .3s}
-.sk:hover{background:var(--surface2);transform:translateY(-2px)}
-.sk:hover::after,.sk:hover::before{opacity:1}
-.sk-num{font-family:var(--fm);font-size:.65rem;color:var(--muted);letter-spacing:.1em;margin-bottom:14px}
-.sk-icon{width:46px;height:46px;border-radius:12px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:1.35rem;margin-bottom:18px;transition:transform .3s}
-.sk:hover .sk-icon{transform:scale(1.1) rotate(-5deg)}
-.sk-name{font-family:var(--fh);font-size:1.05rem;font-weight:600;letter-spacing:-.02em;margin-bottom:9px;color:var(--text)}
-.sk-desc{font-size:.83rem;color:var(--muted2);line-height:1.65}
-.sk-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+.skills-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:16px;overflow:hidden;border:1px solid var(--border)}
+.sk{background:rgba(13,15,26,.7);backdrop-filter:blur(8px);padding:32px 28px;position:relative;overflow:hidden;transition:background .35s,transform .35s cubic-bezier(.34,1.4,.5,1)}
+.sk::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--ac,var(--green)),transparent);transform:scaleX(0);transform-origin:left;transition:transform .55s cubic-bezier(.2,.7,.2,1)}
+.sk::before{content:'';position:absolute;inset:0;background:radial-gradient(360px circle at var(--sx,50%) var(--sy,50%),rgba(255,255,255,.06),transparent 50%);opacity:0;transition:opacity .35s;pointer-events:none}
+.sk:hover{background:rgba(18,21,42,.78);transform:translateY(-4px)}
+.sk:hover::after{transform:scaleX(1)}
+.sk:hover::before{opacity:1}
+.sk-num{font-family:var(--fm);font-size:.65rem;color:var(--muted);letter-spacing:.1em;margin-bottom:18px}
+.sk-name{font-family:var(--fh);font-size:1.1rem;font-weight:600;letter-spacing:-.02em;margin-bottom:9px;color:var(--text)}
+.sk-desc{font-size:.84rem;color:var(--muted2);line-height:1.65}
+.sk-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
 .pill{font-family:var(--fm);font-size:.62rem;padding:3px 9px;border-radius:6px;border:1px solid var(--border2);color:var(--muted2);transition:border-color .2s,color .2s}
 .sk:hover .pill{border-color:var(--ac,var(--green));color:var(--text)}
 
 /* PROJECTS */
 .proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.pcard{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:border-color .3s,transform .4s,box-shadow .4s;display:flex;flex-direction:column}
-.pcard:hover{border-color:var(--border2);transform:translateY(-6px);box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.pcard{background:rgba(13,15,26,.7);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:border-color .35s,transform .45s cubic-bezier(.34,1.4,.5,1),box-shadow .45s;display:flex;flex-direction:column}
+.pcard:hover{border-color:var(--border2);transform:translateY(-6px);box-shadow:0 22px 60px rgba(0,0,0,.5)}
+.pcard .pvisual{transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.pcard:hover .pvisual{transform:scale(1.04)}
 .pcard.wide{grid-column:span 2;flex-direction:row}
-.pvisual{height:170px;display:flex;align-items:center;justify-content:center;font-size:3.5rem;position:relative;flex-shrink:0;overflow:hidden}
+.pvisual{height:160px;display:flex;align-items:center;justify-content:center;font-size:3.2rem;position:relative;flex-shrink:0;overflow:hidden}
 .pcard.wide .pvisual{width:280px;height:auto;min-height:220px}
-.pvisual::after{content:'';position:absolute;inset:0;background:inherit;filter:blur(20px);opacity:0;transition:opacity .3s;transform:scale(1.1)}
-.pcard:hover .pvisual::after{opacity:.3}
 .pv1{background:radial-gradient(circle at 35% 55%,rgba(79,158,255,.18) 0%,transparent 65%),#070f22}
 .pv2{background:radial-gradient(circle at 65% 45%,rgba(162,89,255,.18) 0%,transparent 65%),#0f0720}
 .pv3{background:radial-gradient(circle at 50% 35%,rgba(0,255,170,.13) 0%,transparent 65%),#071510}
 .pv4{background:radial-gradient(circle at 60% 60%,rgba(255,92,168,.18) 0%,transparent 65%),#1a0715}
-.gh-badge{position:absolute;top:10px;right:10px;display:inline-flex;align-items:center;gap:5px;background:rgba(0,0,0,.6);border:1px solid var(--border2);color:var(--muted2);text-decoration:none;font-family:var(--fm);font-size:.65rem;padding:5px 10px;border-radius:7px;backdrop-filter:blur(8px);transition:color .2s,border-color .2s,transform .2s;z-index:2}
-.gh-badge:hover{color:var(--text);border-color:rgba(255,255,255,.3);transform:scale(1.05)}
+.gh-badge{position:absolute;top:10px;right:10px;display:inline-flex;align-items:center;gap:5px;background:rgba(0,0,0,.6);border:1px solid var(--border2);color:var(--muted2);text-decoration:none;font-family:var(--fm);font-size:.65rem;padding:5px 10px;border-radius:7px;backdrop-filter:blur(8px);transition:color .2s,border-color .2s}
+.gh-badge:hover{color:var(--text);border-color:rgba(255,255,255,.3)}
 .pbody{padding:22px 26px;display:flex;flex-direction:column;flex:1}
 .pcard.wide .pbody{padding:28px 32px;justify-content:center}
 .pmeta{display:flex;align-items:center;gap:10px;margin-bottom:10px}
@@ -182,67 +161,50 @@ section{padding:96px 64px;position:relative;z-index:1}
 .p-cs{background:rgba(255,92,168,.1);color:var(--pink);border:1px solid rgba(255,92,168,.2)}
 .pyr{font-family:var(--fm);font-size:.65rem;color:var(--muted)}
 .ptitle{font-family:var(--fh);font-size:1.08rem;font-weight:600;letter-spacing:-.02em;color:var(--text);margin-bottom:8px}
-.pcard.wide .ptitle{font-size:1.35rem;margin-bottom:12px}
-.pdesc{font-size:.83rem;color:var(--muted2);line-height:1.65;flex:1}
+.pcard.wide .ptitle{font-size:1.32rem;margin-bottom:12px}
+.pdesc{font-size:.84rem;color:var(--muted2);line-height:1.65;flex:1}
 .pstack{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
-.spill{font-family:var(--fm);font-size:.62rem;padding:3px 9px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;color:var(--muted2);transition:all .2s}
-.pcard:hover .spill{border-color:var(--border2);color:var(--muted2)}
-.plink{display:inline-flex;align-items:center;gap:5px;margin-top:16px;font-family:var(--fm);font-size:.73rem;color:var(--green);text-decoration:none;letter-spacing:.03em;transition:gap .2s;width:fit-content}
-.plink:hover{gap:9px}
-.gh-bar{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:36px;padding:18px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;font-family:var(--fm);font-size:.78rem;color:var(--muted2);transition:border-color .2s,background .2s}
-.gh-bar:hover{border-color:var(--border2);background:rgba(255,255,255,.05)}
-.gh-bar a{color:var(--green);text-decoration:none}
-.gh-bar a:hover{text-decoration:underline}
+.spill{font-family:var(--fm);font-size:.62rem;padding:3px 9px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;color:var(--muted2)}
+.plink{display:inline-flex;align-items:center;gap:5px;margin-top:16px;font-family:var(--fm);font-size:.73rem;color:var(--green);text-decoration:none;letter-spacing:.03em;transition:gap .25s,color .25s;width:fit-content;position:relative}
+.plink::after{content:'';position:absolute;left:0;bottom:-3px;height:1px;width:0;background:var(--green);transition:width .35s ease}
+.plink:hover{gap:11px}
+.plink:hover::after{width:100%}
 
 /* CERTIFICATES */
-.certs-section{background:var(--surface)}
 .certs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.cert-card{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:12px;transition:border-color .3s,transform .35s,box-shadow .35s;position:relative;overflow:hidden}
-.cert-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cc,var(--green)),transparent);opacity:0;transition:opacity .3s}
-.cert-card:hover{border-color:var(--border2);transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.35)}
-.cert-card:hover::before{opacity:1}
+.cert-card{background:rgba(13,15,26,.7);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:12px;transition:border-color .35s,transform .35s cubic-bezier(.34,1.4,.5,1),box-shadow .35s;position:relative;overflow:hidden}
+.cert-card::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.045),transparent);transition:left .7s ease;pointer-events:none}
+.cert-card:hover{border-color:var(--border2);transform:translateY(-4px);box-shadow:0 14px 36px rgba(0,0,0,.35)}
+.cert-card:hover::before{left:100%}
 .cert-issuer-row{display:flex;align-items:center;gap:10px}
-.cert-logo{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;border:1px solid var(--border2)}
+.cert-logo{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-weight:600;font-size:.82rem;flex-shrink:0;border:1px solid var(--border2);color:var(--muted2)}
 .cert-issuer{font-family:var(--fm);font-size:.68rem;color:var(--muted);letter-spacing:.04em}
-.cert-name{font-family:var(--fh);font-size:.95rem;font-weight:600;letter-spacing:-.02em;color:var(--text);line-height:1.3}
+.cert-name{font-family:var(--fh);font-size:.95rem;font-weight:600;letter-spacing:-.02em;color:var(--text);line-height:1.3;flex:1}
 .cert-date{font-family:var(--fm);font-size:.65rem;color:var(--muted);display:flex;align-items:center;gap:6px}
-.cert-date::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--cc,var(--green));flex-shrink:0}
-.cert-skills{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.cert-date::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--cc,var(--green));flex-shrink:0}
+.cert-skills{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
 .cert-skill{font-family:var(--fm);font-size:.6rem;padding:2px 8px;border-radius:5px;border:1px solid var(--border);color:var(--muted2);background:rgba(255,255,255,.03)}
-
-/* PROCESS */
-.proc-section{background:var(--bg)}
-.proc-list{border-top:1px solid var(--border)}
-.proc-row{display:grid;grid-template-columns:52px 200px 1fr 40px;align-items:center;gap:28px;padding:26px 8px;border-bottom:1px solid var(--border);border-radius:8px;transition:background .2s,padding-left .25s,box-shadow .2s}
-.proc-row:hover{background:rgba(255,255,255,.025);padding-left:16px;box-shadow:inset 3px 0 0 var(--green)}
-.pstep{font-family:var(--fm);font-size:.68rem;color:var(--green);font-weight:500;letter-spacing:.1em}
-.pname{font-family:var(--fh);font-size:.98rem;font-weight:600;letter-spacing:-.02em;color:var(--text)}
-.pdesc-t{font-size:.83rem;color:var(--muted2);line-height:1.6}
-.picon{font-size:1.3rem;opacity:.45;text-align:right;transition:opacity .2s,transform .2s}
-.proc-row:hover .picon{opacity:1;transform:scale(1.2)}
-
-/* TESTIMONIALS */
-.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.tcard{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:30px;transition:border-color .3s,transform .35s}
-.tcard:hover{border-color:var(--border2);transform:translateY(-3px)}
-.tstars{color:var(--yellow);font-size:.85rem;letter-spacing:2px;margin-bottom:14px}
-.ttext{font-size:.88rem;color:var(--muted2);line-height:1.75;font-style:italic;margin-bottom:22px}
-.tauthor{display:flex;align-items:center;gap:12px}
-.tav{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:700;font-size:.78rem;color:#000;flex-shrink:0}
-.tname{font-size:.86rem;font-weight:600;color:var(--text)}
-.trole{font-family:var(--fm);font-size:.68rem;color:var(--muted);margin-top:1px}
+.cert-cta{margin-top:32px;text-align:center}
+.cert-cta a{display:inline-flex;align-items:center;gap:8px;font-family:var(--fm);font-size:.78rem;color:var(--blue);text-decoration:none;border:1px solid rgba(79,158,255,.22);padding:10px 20px;border-radius:10px;background:rgba(79,158,255,.05);transition:border-color .2s,background .2s}
+.cert-cta a:hover{border-color:rgba(79,158,255,.45);background:rgba(79,158,255,.1)}
 
 /* CTA */
-.cta-section{background:linear-gradient(160deg,var(--surface) 0%,var(--surface2) 100%);border-top:1px solid var(--border);text-align:center;padding:120px 64px;position:relative;overflow:hidden}
-.cta-section::before{content:'';position:absolute;width:700px;height:700px;background:radial-gradient(circle,rgba(0,255,170,.08) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;animation:glowPulse 4s ease-in-out infinite}
-.cta-eye{font-family:var(--fm);font-size:.7rem;color:var(--green);letter-spacing:.14em;text-transform:uppercase;margin-bottom:18px}
-.cta-section h2{font-family:var(--fh);font-size:clamp(2.2rem,4vw,3.6rem);font-weight:700;letter-spacing:-.03em;line-height:1.1;margin-bottom:16px;position:relative}
-.cta-section p{font-size:.98rem;color:var(--muted2);margin-bottom:42px;position:relative}
-.btn-cta{display:inline-flex;align-items:center;gap:10px;background:var(--green);color:#000;padding:15px 38px;border-radius:12px;font-family:var(--fh);font-weight:700;font-size:.98rem;text-decoration:none;position:relative;transition:transform .2s,box-shadow .2s}
-.btn-cta:hover{transform:translateY(-3px);box-shadow:0 16px 52px rgba(0,255,170,.35)}
+.cta{position:relative;z-index:1;text-align:center;padding:120px 56px;border-top:1px solid var(--border);overflow:hidden}
+.cta::before{content:'';position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(0,255,170,.08) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;animation:drift1 8s ease-in-out infinite}
+.cta-eye{font-family:var(--fm);font-size:.7rem;color:var(--green);letter-spacing:.14em;text-transform:uppercase;margin-bottom:18px;position:relative}
+.cta h2{font-family:var(--fh);font-size:clamp(2.2rem,4vw,3.4rem);font-weight:700;letter-spacing:-.03em;line-height:1.1;margin-bottom:16px;position:relative}
+.cta p{font-size:.98rem;color:var(--muted2);margin-bottom:38px;position:relative}
+.btn-cta{display:inline-flex;align-items:center;gap:10px;background:var(--green);color:#000;padding:15px 36px;border-radius:12px;font-family:var(--fh);font-weight:700;font-size:.98rem;text-decoration:none;position:relative;overflow:hidden;isolation:isolate;transition:transform .3s cubic-bezier(.34,1.4,.5,1),box-shadow .3s;animation:ctaPulse 2.6s ease-in-out infinite}
+.btn-cta svg{transition:transform .3s cubic-bezier(.34,1.4,.5,1)}
+.btn-cta::before{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.4) 50%,transparent 70%);transform:translateX(-110%);transition:transform .65s ease;z-index:-1}
+.btn-cta:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 20px 56px rgba(0,255,170,.4),0 0 0 6px rgba(0,255,170,.12)}
+.btn-cta:hover svg{transform:translateX(6px)}
+.btn-cta:hover::before{transform:translateX(110%)}
+.btn-cta:active{transform:translateY(-1px) scale(.98)}
+@keyframes ctaPulse{0%,100%{box-shadow:0 12px 36px rgba(0,255,170,.22),0 0 0 0 rgba(0,255,170,.32)}50%{box-shadow:0 12px 36px rgba(0,255,170,.22),0 0 0 10px rgba(0,255,170,0)}}
 
 /* FOOTER */
-footer{padding:28px 64px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
+footer{position:relative;z-index:1;padding:28px 56px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
 .flogo{font-family:var(--fm);font-size:.88rem;color:var(--green);text-decoration:none}
 .flogo span{color:var(--muted)}
 .flinks{display:flex;gap:24px;list-style:none}
@@ -250,81 +212,98 @@ footer{padding:28px 64px;border-top:1px solid var(--border);display:flex;align-i
 .flinks a:hover{color:var(--text)}
 .fcopy{font-family:var(--fm);font-size:.72rem;color:var(--muted)}
 
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-
 /* RESPONSIVE */
 @media(max-width:1024px){
-  nav,section,.cta-section,footer{padding-left:32px;padding-right:32px}
-  .hero{padding:100px 32px 80px;grid-template-columns:1fr}
+  nav,section,.cta,footer{padding-left:32px;padding-right:32px}
+  .hero{padding:108px 32px 64px;grid-template-columns:1fr}
   .hero-right{display:none}
-  .scroll-expand-pin{padding-left:32px;padding-right:32px}
-  .scroll-expand-content{width:min(760px,calc(100% - 64px));grid-template-columns:1fr 1fr}
-  .scroll-expand-copy{grid-column:span 2}
-  .stats-row{margin:0 32px;grid-template-columns:repeat(2,1fr)}
   .skills-grid{grid-template-columns:1fr 1fr}
   .proj-grid{grid-template-columns:1fr}
   .pcard.wide{grid-column:auto;flex-direction:column}
   .pcard.wide .pvisual{width:100%;height:160px}
   .certs-grid{grid-template-columns:1fr 1fr}
-  .proc-row{grid-template-columns:48px 1fr}
-  .pdesc-t,.picon{display:none}
-  .tgrid{grid-template-columns:1fr}
-  footer{flex-direction:column;gap:16px;text-align:center}
+  footer{flex-direction:column;text-align:center}
 }
 @media(max-width:600px){
-  nav{padding:0 20px}
-  .nav-links{display:none}
-  section{padding:64px 20px}
-  .scroll-expand{min-height:205vh;padding:0}
-  .scroll-expand-pin{padding:84px 20px 32px}
-  .scroll-expand-title span{font-size:clamp(2.4rem,15vw,4.6rem)}
-  .scroll-expand-date{font-size:1rem}
-  .scroll-expand-hint{font-size:.66rem}
-  .scroll-expand-content{bottom:20px;width:calc(100% - 40px);grid-template-columns:1fr;gap:8px}
-  .scroll-expand-copy{grid-column:auto;padding:16px}
-  .scroll-expand-copy h2{font-size:1.15rem}
-  .scroll-expand-copy p,.scroll-expand-chip span{font-size:.76rem}
-  .scroll-expand-chip{padding:14px}
+  nav{padding:0 20px}.nav-links{display:none}
+  section,.cta,footer{padding-left:20px;padding-right:20px}
   .skills-grid,.certs-grid{grid-template-columns:1fr}
-  .stats-row{margin:0 20px}
-  .cta-section{padding:80px 20px}
 }
 @media(prefers-reduced-motion:reduce){
-  .scroll-expand{min-height:auto}
-  .scroll-expand-pin{position:relative;min-height:100dvh}
-  .scroll-expand-scan{animation:none}
+  .mesh .blob,.aurora::before,.stars i,.grid-overlay,.bdot,.tcur,.cta::before,.btn-cta,#progress-bar{animation:none!important}
+  .reveal{filter:none!important;transform:none!important;transition:opacity .3s ease!important}
 }
+
+/* ─────── TWEAKS PANEL ─────── */
+#tw-panel{position:fixed;right:18px;bottom:18px;z-index:2147483646;width:300px;
+  background:rgba(13,15,26,.86);color:#eef0ff;border:1px solid rgba(255,255,255,.14);border-radius:14px;
+  backdrop-filter:blur(28px) saturate(160%);box-shadow:0 20px 60px rgba(0,0,0,.55);
+  font-family:var(--fm);font-size:11.5px;line-height:1.45;padding:14px 14px 16px;display:none}
+#tw-panel.tw-on{display:block;animation:fadeUp .3s ease}
+.tw-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.tw-hd b{font-family:var(--fh);font-size:12.5px;font-weight:600;letter-spacing:.04em;color:#fff}
+.tw-x{appearance:none;background:transparent;border:0;color:rgba(255,255,255,.5);width:24px;height:24px;border-radius:6px;font-size:14px;line-height:1;cursor:pointer}
+.tw-x:hover{background:rgba(255,255,255,.07);color:#fff}
+.tw-row{margin-bottom:14px}.tw-row:last-child{margin-bottom:2px}
+.tw-lbl{display:flex;justify-content:space-between;align-items:baseline;color:rgba(238,240,255,.55);text-transform:uppercase;letter-spacing:.1em;font-size:9.5px;font-weight:600;margin-bottom:7px}
+.tw-lbl em{font-style:normal;color:var(--green);text-transform:none;letter-spacing:.02em;font-size:10.5px;font-weight:500}
+.tw-seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:3px}
+.tw-seg button{appearance:none;background:transparent;border:0;color:rgba(238,240,255,.65);font-family:inherit;font-size:10.5px;font-weight:500;letter-spacing:.02em;text-transform:capitalize;padding:7px 6px;border-radius:6px;cursor:pointer;transition:background .18s,color .18s,box-shadow .18s}
+.tw-seg button:hover{color:#fff}
+.tw-seg button.on{background:linear-gradient(180deg,rgba(0,255,170,.18),rgba(0,255,170,.08));color:#00ffaa;box-shadow:inset 0 0 0 1px rgba(0,255,170,.35),0 0 12px rgba(0,255,170,.15)}
+.tw-foot{font-size:9.5px;color:rgba(238,240,255,.32);margin-top:6px;letter-spacing:.04em}
+
+/* Vibe palette swaps */
+body[data-vibe="aurora"]{--green:#a259ff;--blue:#4f9eff;--purple:#ff5ca8;--pink:#ff5ca8;--yellow:#7c5cff}
+body[data-vibe="sunset"]{--green:#ffcb47;--blue:#ff9d4d;--purple:#ff5ca8;--pink:#ff5ca8;--yellow:#ffe66b}
+
+/* Energy */
+body[data-energy="calm"] .mesh::before,body[data-energy="calm"] .mesh::after{animation-duration:38s!important;opacity:.4!important}
+body[data-energy="calm"] .bdot,body[data-energy="calm"] .tcur{animation-duration:3.4s!important}
+body[data-energy="electric"] .mesh::before,body[data-energy="electric"] .mesh::after{animation-duration:9s!important;opacity:.85!important;filter:blur(90px) saturate(1.3)}
+body[data-energy="electric"] .bdot,body[data-energy="electric"] .tcur{animation-duration:.65s!important}
+body[data-energy="electric"] .cta::before{animation-duration:3s!important;opacity:1.2}
+
+/* Type mode */
+body[data-typemode="mono"] .hero-name{font-family:var(--fm)!important;font-size:clamp(2.2rem,4.2vw,4rem)!important;letter-spacing:-.02em!important;line-height:1.1!important}
+body[data-typemode="mono"] .hero-name .solid::before{content:"> ";color:var(--green);opacity:.6}
+body[data-typemode="mono"] .hero-name .outline{-webkit-text-stroke:1px rgba(255,255,255,.3)!important;font-family:var(--fm)!important}
+body[data-typemode="mono"] .hero-name .outline::after{content:"_";color:var(--green);-webkit-text-stroke:0;animation:blink 1s step-end infinite;margin-left:.1em}
+body[data-typemode="display"] .hero-name{font-size:clamp(3.6rem,7vw,7rem)!important;letter-spacing:-.05em!important;line-height:.92!important}
+body[data-typemode="display"] .hero-name .solid{background:linear-gradient(110deg,var(--green) 0%,var(--blue) 45%,var(--purple) 80%,var(--pink) 100%);background-size:200% 100%;background-clip:text;-webkit-background-clip:text;color:transparent;animation:gradShift 8s ease-in-out infinite}
+body[data-typemode="display"] .hero-name .outline{-webkit-text-stroke:2px rgba(255,255,255,.18)!important;letter-spacing:-.05em!important}
+@keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 </style>
 </head>
-<body>
-<canvas id="bg-canvas"></canvas>
-<div id="progress-bar"></div>
-<div id="cur"></div>
-<div id="curR"></div>
-<div id="particles"></div>
+<body data-vibe="aurora" data-energy="electric" data-typemode="hybrid">
 
-<nav id="navbar">
+<div class="mesh"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+<div class="aurora"></div>
+<div class="stars" id="stars"></div>
+<div class="grid-overlay"></div>
+<div class="spotlight" id="spotlight"></div>
+<div id="progress-bar"></div>
+
+<nav>
   <a href="#" class="logo">tarun<span>.dev</span></a>
   <ul class="nav-links">
-    <li><a href="#showreel">Showreel</a></li>
     <li><a href="#skills">Skills</a></li>
     <li><a href="#projects">Projects</a></li>
     <li><a href="#certificates">Certificates</a></li>
-    <li><a href="#process">Process</a></li>
     <li><a href="#contact" class="nav-cta">Contact</a></li>
   </ul>
 </nav>
 
 <section class="hero">
-  <div class="hero-grid"></div>
-  <div class="hero-glow"></div>
   <div class="hero-left">
-    <div class="hero-badge"><div class="bdot"></div>AI Student &nbsp;·&nbsp; Anglia Ruskin University</div>
+    <div class="hero-badge"><div class="bdot"></div>AI Student · Anglia Ruskin University</div>
     <h1 class="hero-name"><span class="solid">Tarun</span><span class="outline">Tamilselvan.</span></h1>
     <div class="hero-role"><span class="cm">// </span>ML Engineer &amp; Cloud Enthusiast</div>
     <p class="hero-desc">Studying Artificial Intelligence at Anglia Ruskin University. I build intelligent systems — from training deep learning models to deploying them on scalable cloud infrastructure.</p>
     <div class="hero-btns">
-      <a href="#projects" class="btn btn-g">View Projects <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
+      <a href="#projects" class="btn btn-g">View Projects
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </a>
       <a href="#" onclick="window.location.href='ma'+'il'+'to:'+atob('VGFydW5ydEBob3RtYWlsLmNvbQ==');return false;" class="btn btn-gh">Get In Touch</a>
     </div>
   </div>
@@ -332,13 +311,12 @@ footer{padding:28px 64px;border-top:1px solid var(--border);display:flex;align-i
     <div class="terminal">
       <div class="t-hdr"><div class="tdot tr"></div><div class="tdot ty"></div><div class="tdot tg2"></div><span class="t-fname">profile.py — tarun@aru</span></div>
       <div class="t-body">
-        <div><span class="tc"># Tarun Ramasamy Tamilselvan</span></div>
+        <div><span class="tc"># whoami</span></div>
         <div>&nbsp;</div>
         <div><span class="tk">profile</span> = {</div>
         <div>&nbsp;&nbsp;<span class="tk">name</span>: <span class="ts">"Tarun R. Tamilselvan"</span>,</div>
         <div>&nbsp;&nbsp;<span class="tk">role</span>: <span class="ts">"AI Student"</span>,</div>
-        <div>&nbsp;&nbsp;<span class="tk">university</span>: <span class="ts">"Anglia Ruskin"</span>,</div>
-        <div>&nbsp;&nbsp;<span class="tk">skills</span>: [<span class="ts">"ML"</span>, <span class="ts">"Cloud"</span>, <span class="ts">"DL"</span>],</div>
+        <div>&nbsp;&nbsp;<span class="tk">stack</span>: [<span class="ts">"PyTorch"</span>, <span class="ts">"AWS"</span>],</div>
         <div>&nbsp;&nbsp;<span class="tk">certs</span>: <span class="tn">9</span>,</div>
         <div>&nbsp;&nbsp;<span class="tk">open_to_work</span>: <span class="tn">True</span></div>
         <div>}</div>
@@ -349,222 +327,170 @@ footer{padding:28px 64px;border-top:1px solid var(--border);display:flex;align-i
   </div>
 </section>
 
-<section class="scroll-expand" id="showreel" aria-label="Scroll expandable media feature">
-  <div class="scroll-expand-pin">
-    <div class="scroll-expand-bg" data-scroll-bg>
-      <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&amp;fit=crop&amp;w=1920&amp;q=80" alt="Circuit board background">
-    </div>
-
-    <div class="scroll-expand-frame" data-scroll-frame>
-      <div class="scroll-expand-media-wrap">
-        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&amp;fit=crop&amp;w=1600&amp;q=80" alt="Analytics dashboard on a workstation">
-        <div class="scroll-expand-overlay" data-scroll-overlay></div>
-        <div class="scroll-expand-scan"></div>
-      </div>
-      <div class="scroll-expand-meta">
-        <p class="scroll-expand-date" data-scroll-date>2026 Portfolio Focus</p>
-        <p class="scroll-expand-hint" data-scroll-hint>Scroll to expand</p>
-      </div>
-    </div>
-
-    <div class="scroll-expand-title" aria-label="AI Cloud Systems">
-      <span data-scroll-title-left>AI</span>
-      <span data-scroll-title-right>Cloud Systems</span>
-    </div>
-
-    <div class="scroll-expand-content" data-scroll-content>
-      <div class="scroll-expand-copy">
-        <div class="eyebrow">Interactive Profile</div>
-        <h2>Turning model experiments into deployed cloud systems.</h2>
-        <p>I connect experimentation, deployment, and monitoring so models can move from notebooks into practical services.</p>
-      </div>
-      <div class="scroll-expand-chip"><strong>Model</strong><span>Training, evaluation, and iteration with Python, PyTorch, and TensorFlow.</span></div>
-      <div class="scroll-expand-chip"><strong>Deploy</strong><span>Containerised services and cloud infrastructure across AWS, Azure, and GCP.</span></div>
-      <div class="scroll-expand-chip"><strong>Monitor</strong><span>Practical ML workflows with metrics, drift checks, and continuous improvement.</span></div>
-    </div>
-  </div>
-</section>
-
-<div class="stats-row reveal">
-  <div class="stat"><span class="snum">4</span><span class="slbl">GitHub Repos</span></div>
-  <div class="stat"><span class="snum">9</span><span class="slbl">Certificates</span></div>
-  <div class="stat"><span class="snum">ARU</span><span class="slbl">University</span></div>
-  <div class="stat"><span class="snum">AI</span><span class="slbl">Specialisation</span></div>
-</div>
-
-<div class="mwrap">
-  <div class="minner">
-    <div class="mitem">🐍 Python</div><div class="mitem">🔥 PyTorch</div><div class="mitem">🧠 TensorFlow</div>
-    <div class="mitem">☁️ AWS</div><div class="mitem">🌐 Azure</div><div class="mitem">⚡ GCP</div>
-    <div class="mitem">🐳 Docker</div><div class="mitem">🤗 HuggingFace</div><div class="mitem">🔗 LangChain</div>
-    <div class="mitem">📊 Pandas</div><div class="mitem">🔬 scikit-learn</div><div class="mitem">🚀 MLflow</div>
-    <div class="mitem">🐍 Python</div><div class="mitem">🔥 PyTorch</div><div class="mitem">🧠 TensorFlow</div>
-    <div class="mitem">☁️ AWS</div><div class="mitem">🌐 Azure</div><div class="mitem">⚡ GCP</div>
-    <div class="mitem">🐳 Docker</div><div class="mitem">🤗 HuggingFace</div><div class="mitem">🔗 LangChain</div>
-    <div class="mitem">📊 Pandas</div><div class="mitem">🔬 scikit-learn</div><div class="mitem">🚀 MLflow</div>
-  </div>
-</div>
-
 <section id="skills">
-  <div class="reveal"><div class="eyebrow">What I Do</div><h2 class="sec-title">Skills &amp; <em>Expertise</em></h2></div>
+  <div class="sec-head reveal">
+    <div class="eyebrow">What I Do</div>
+    <h2 class="sec-title">Skills &amp; <em>Expertise</em></h2>
+  </div>
   <div class="skills-grid">
-    <div class="sk reveal stagger-1" style="--ac:var(--green)"><div class="sk-num">01</div><div class="sk-icon" style="background:rgba(0,255,170,.06)">🤖</div><div class="sk-name">Machine Learning</div><p class="sk-desc">Supervised, unsupervised, and RL models to solve real-world prediction and classification problems.</p><div class="sk-pills"><span class="pill">scikit-learn</span><span class="pill">XGBoost</span><span class="pill">NumPy</span></div></div>
-    <div class="sk reveal stagger-2" style="--ac:var(--blue)"><div class="sk-num">02</div><div class="sk-icon" style="background:rgba(79,158,255,.06)">☁️</div><div class="sk-name">Cloud Computing</div><p class="sk-desc">Scalable solutions on AWS, Azure, and GCP — serverless, containers, and managed ML services.</p><div class="sk-pills"><span class="pill">AWS</span><span class="pill">Azure</span><span class="pill">GCP</span></div></div>
-    <div class="sk reveal stagger-3" style="--ac:var(--yellow)"><div class="sk-num">03</div><div class="sk-icon" style="background:rgba(255,203,71,.06)">🧠</div><div class="sk-name">Deep Learning</div><p class="sk-desc">CNN, RNN, and Transformer architectures for vision, NLP, and time-series using PyTorch and Keras.</p><div class="sk-pills"><span class="pill">PyTorch</span><span class="pill">Keras</span><span class="pill">ONNX</span></div></div>
-    <div class="sk reveal stagger-4" style="--ac:var(--pink)"><div class="sk-num">04</div><div class="sk-icon" style="background:rgba(255,92,168,.06)">📊</div><div class="sk-name">Data Analysis</div><p class="sk-desc">End-to-end pipelines, EDA, and visualisations that uncover patterns and drive decisions.</p><div class="sk-pills"><span class="pill">Pandas</span><span class="pill">Seaborn</span><span class="pill">Plotly</span></div></div>
-    <div class="sk reveal stagger-5" style="--ac:var(--green)"><div class="sk-num">05</div><div class="sk-icon" style="background:rgba(0,255,170,.06)">🔁</div><div class="sk-name">MLOps &amp; CI/CD</div><p class="sk-desc">Automating ML workflows with Docker, GitHub Actions, and MLflow from training to production.</p><div class="sk-pills"><span class="pill">Docker</span><span class="pill">MLflow</span><span class="pill">GitHub Actions</span></div></div>
-    <div class="sk reveal stagger-6" style="--ac:var(--purple)"><div class="sk-num">06</div><div class="sk-icon" style="background:rgba(162,89,255,.06)">💬</div><div class="sk-name">NLP &amp; Gen AI</div><p class="sk-desc">Fine-tuning LLMs, RAG pipelines, and chatbots with HuggingFace Transformers and LangChain.</p><div class="sk-pills"><span class="pill">HuggingFace</span><span class="pill">LangChain</span><span class="pill">RAG</span></div></div>
+    <div class="sk reveal stagger-1" style="--ac:var(--green)"><div class="sk-num">01</div><div class="sk-name">Machine Learning</div><p class="sk-desc">Supervised, unsupervised, and reinforcement learning models for prediction and classification.</p><div class="sk-pills"><span class="pill">scikit-learn</span><span class="pill">XGBoost</span><span class="pill">NumPy</span></div></div>
+    <div class="sk reveal stagger-2" style="--ac:var(--blue)"><div class="sk-num">02</div><div class="sk-name">Cloud Computing</div><p class="sk-desc">Scalable solutions on AWS, Azure, and GCP — serverless, containers, managed ML services.</p><div class="sk-pills"><span class="pill">AWS</span><span class="pill">Azure</span><span class="pill">GCP</span></div></div>
+    <div class="sk reveal stagger-3" style="--ac:var(--yellow)"><div class="sk-num">03</div><div class="sk-name">Deep Learning</div><p class="sk-desc">CNN, RNN, and Transformer architectures for vision, NLP, and time-series tasks.</p><div class="sk-pills"><span class="pill">PyTorch</span><span class="pill">Keras</span><span class="pill">ONNX</span></div></div>
+    <div class="sk reveal stagger-4" style="--ac:var(--pink)"><div class="sk-num">04</div><div class="sk-name">Data Analysis</div><p class="sk-desc">End-to-end pipelines, EDA, and visualisations that uncover patterns and drive decisions.</p><div class="sk-pills"><span class="pill">Pandas</span><span class="pill">Seaborn</span><span class="pill">Plotly</span></div></div>
+    <div class="sk reveal stagger-5" style="--ac:var(--green)"><div class="sk-num">05</div><div class="sk-name">MLOps &amp; CI/CD</div><p class="sk-desc">Automating ML workflows with Docker, GitHub Actions, and MLflow from training to production.</p><div class="sk-pills"><span class="pill">Docker</span><span class="pill">MLflow</span><span class="pill">Actions</span></div></div>
+    <div class="sk reveal stagger-6" style="--ac:var(--purple)"><div class="sk-num">06</div><div class="sk-name">NLP &amp; Gen AI</div><p class="sk-desc">Fine-tuning LLMs, RAG pipelines, and chatbots with HuggingFace Transformers and LangChain.</p><div class="sk-pills"><span class="pill">HuggingFace</span><span class="pill">LangChain</span><span class="pill">RAG</span></div></div>
   </div>
 </section>
 
-<section id="projects" style="background:var(--surface)">
-  <div class="reveal"><div class="eyebrow">github.com/tarun2135445</div><h2 class="sec-title">My <em>Projects</em></h2></div>
+<section id="projects">
+  <div class="sec-head reveal">
+    <div class="eyebrow">github.com/tarun2135445</div>
+    <h2 class="sec-title">Selected <em>Projects</em></h2>
+    <p class="sec-sub">A few of the things I've shipped — from real-time computer vision to cloud-deployed software.</p>
+  </div>
   <div class="proj-grid">
-    <div class="pcard wide reveal-left">
-      <div class="pvisual pv1">🤟
-        <a href="https://github.com/tarun2135445/bsl" target="_blank" rel="noopener" class="gh-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> GitHub</a>
+    <div class="pcard wide reveal">
+      <div class="pvisual pv1">
+        <a href="https://github.com/tarun2135445/bsl" target="_blank" rel="noopener" class="gh-badge">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> GitHub</a>
       </div>
       <div class="pbody">
         <div class="pmeta"><span class="ptag p-cv">Computer Vision</span><span class="pyr">2024</span></div>
         <div class="ptitle">BSL — British Sign Language Recognition</div>
         <p class="pdesc">A machine learning project that recognises British Sign Language gestures in real time using computer vision — making communication more accessible for the deaf and hard-of-hearing community.</p>
-        <div class="pstack"><span class="spill">Python</span><span class="spill">OpenCV</span><span class="spill">Computer Vision</span><span class="spill">ML</span></div>
+        <div class="pstack"><span class="spill">Python</span><span class="spill">OpenCV</span><span class="spill">CV</span><span class="spill">ML</span></div>
         <a href="https://github.com/tarun2135445/bsl" target="_blank" rel="noopener" class="plink">View Repository →</a>
       </div>
     </div>
+
     <div class="pcard reveal stagger-1">
-      <div class="pvisual pv2">🏙️<a href="https://github.com/tarun2135445/citisoft-project-soft-" target="_blank" rel="noopener" class="gh-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> GitHub</a></div>
-      <div class="pbody"><div class="pmeta"><span class="ptag p-sw">Software Project</span><span class="pyr">2024</span></div><div class="ptitle">Citisoft Project</div><p class="pdesc">A collaborative software engineering project applying structured development practices and system design principles.</p><div class="pstack"><span class="spill">Python</span><span class="spill">Software Engineering</span></div><a href="https://github.com/tarun2135445/citisoft-project-soft-" target="_blank" rel="noopener" class="plink">View Repository →</a></div>
+      <div class="pvisual pv2">
+        <a href="https://github.com/tarun2135445/citisoft-project-soft-" target="_blank" rel="noopener" class="gh-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> GitHub</a>
+      </div>
+      <div class="pbody">
+        <div class="pmeta"><span class="ptag p-sw">Software Project</span><span class="pyr">2024</span></div>
+        <div class="ptitle">Citisoft Project</div>
+        <p class="pdesc">A collaborative software engineering project applying structured development practices and system design principles.</p>
+        <div class="pstack"><span class="spill">Python</span><span class="spill">SDLC</span></div>
+        <a href="https://github.com/tarun2135445/citisoft-project-soft-" target="_blank" rel="noopener" class="plink">View Repository →</a>
+      </div>
     </div>
+
     <div class="pcard reveal stagger-2">
-      <div class="pvisual pv3">⚙️<a href="https://github.com/tarun2135445/software-engineering-2024-december" target="_blank" rel="noopener" class="gh-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> GitHub</a></div>
-      <div class="pbody"><div class="pmeta"><span class="ptag p-se">Software Engineering</span><span class="pyr">Dec 2024</span></div><div class="ptitle">Software Engineering — Dec 2024</div><p class="pdesc">End-of-year coursework covering system design, agile methodology, testing, and the full software development lifecycle.</p><div class="pstack"><span class="spill">Agile</span><span class="spill">System Design</span><span class="spill">Testing</span></div><a href="https://github.com/tarun2135445/software-engineering-2024-december" target="_blank" rel="noopener" class="plink">View Repository →</a></div>
+      <div class="pvisual pv3">
+        <a href="https://github.com/tarun2135445/software-engineering-2024-december" target="_blank" rel="noopener" class="gh-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> GitHub</a>
+      </div>
+      <div class="pbody">
+        <div class="pmeta"><span class="ptag p-se">Software Engineering</span><span class="pyr">Dec 2024</span></div>
+        <div class="ptitle">Software Engineering — Dec 2024</div>
+        <p class="pdesc">Coursework covering system design, agile methodology, testing, and the full software development lifecycle.</p>
+        <div class="pstack"><span class="spill">Agile</span><span class="spill">Testing</span></div>
+        <a href="https://github.com/tarun2135445/software-engineering-2024-december" target="_blank" rel="noopener" class="plink">View Repository →</a>
+      </div>
     </div>
-    <div class="pcard wide reveal-right">
-      <div class="pvisual pv4">💻<a href="https://github.com/tarun2135445/code-software-" target="_blank" rel="noopener" class="gh-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> GitHub</a></div>
-      <div class="pbody"><div class="pmeta"><span class="ptag p-cs">C# / .NET</span><span class="pyr">2024</span></div><div class="ptitle">Code Software — C# Application</div><p class="pdesc">A C# software development project demonstrating object-oriented programming, application architecture, and structured code design patterns using .NET.</p><div class="pstack"><span class="spill">C#</span><span class="spill">.NET</span><span class="spill">OOP</span></div><a href="https://github.com/tarun2135445/code-software-" target="_blank" rel="noopener" class="plink">View Repository →</a></div>
+
+    <div class="pcard wide reveal">
+      <div class="pvisual pv4">
+        <a href="https://github.com/tarun2135445/code-software-" target="_blank" rel="noopener" class="gh-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> GitHub</a>
+      </div>
+      <div class="pbody">
+        <div class="pmeta"><span class="ptag p-cs">C# / .NET</span><span class="pyr">2024</span></div>
+        <div class="ptitle">Code Software — C# Application</div>
+        <p class="pdesc">A C# software development project demonstrating object-oriented programming, application architecture, and structured code design patterns using .NET.</p>
+        <div class="pstack"><span class="spill">C#</span><span class="spill">.NET</span><span class="spill">OOP</span></div>
+        <a href="https://github.com/tarun2135445/code-software-" target="_blank" rel="noopener" class="plink">View Repository →</a>
+      </div>
     </div>
   </div>
-  <a href="https://github.com/tarun2135445" target="_blank" rel="noopener" class="gh-bar reveal">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-    View all repositories on github.com/tarun2135445 →
-  </a>
 </section>
 
-<!-- CERTIFICATES -->
-<section id="certificates" class="certs-section">
-  <div class="reveal"><div class="eyebrow">LinkedIn Verified</div><h2 class="sec-title">Certificates &amp; <em>Credentials</em></h2></div>
+<section id="certificates">
+  <div class="sec-head reveal">
+    <div class="eyebrow">LinkedIn Verified · 11 Active</div>
+    <h2 class="sec-title">Certificates &amp; <em>Credentials</em></h2>
+  </div>
   <div class="certs-grid">
-
     <div class="cert-card reveal stagger-1" style="--cc:var(--yellow)">
-      <div class="cert-issuer-row"><div class="cert-logo" style="background:rgba(255,153,0,.1)">☁️</div><span class="cert-issuer">Amazon Web Services (AWS)</span></div>
+      <div class="cert-issuer-row"><div class="cert-logo">AWS</div><span class="cert-issuer">Amazon Web Services</span></div>
       <div class="cert-name">AWS Academy Graduate — Cloud Foundations</div>
       <div class="cert-date">Jan 2026</div>
-      <div class="cert-skills"><span class="cert-skill">Amazon EC2</span><span class="cert-skill">Amazon S3</span><span class="cert-skill">NFS</span><span class="cert-skill">Amazon RDS</span></div>
+      <div class="cert-skills"><span class="cert-skill">EC2</span><span class="cert-skill">S3</span><span class="cert-skill">RDS</span></div>
     </div>
-
     <div class="cert-card reveal stagger-2" style="--cc:var(--blue)">
-      <div class="cert-issuer-row"><div class="cert-logo" style="background:rgba(79,158,255,.1)">🔢</div><span class="cert-issuer">MathWorks</span></div>
+      <div class="cert-issuer-row"><div class="cert-logo">MW</div><span class="cert-issuer">MathWorks</span></div>
       <div class="cert-name">Computer Vision Onramp</div>
       <div class="cert-date">Oct 2025</div>
       <div class="cert-skills"><span class="cert-skill">Computer Vision</span></div>
     </div>
-
     <div class="cert-card reveal stagger-3" style="--cc:var(--blue)">
-      <div class="cert-issuer-row"><div class="cert-logo" style="background:rgba(79,158,255,.1)">🖼️</div><span class="cert-issuer">MathWorks</span></div>
+      <div class="cert-issuer-row"><div class="cert-logo">MW</div><span class="cert-issuer">MathWorks</span></div>
       <div class="cert-name">Image Processing Onramp</div>
       <div class="cert-date">Oct 2025</div>
       <div class="cert-skills"><span class="cert-skill">Image Processing</span></div>
     </div>
-
     <div class="cert-card reveal stagger-4" style="--cc:var(--blue)">
-      <div class="cert-issuer-row"><div class="cert-logo" style="background:rgba(79,158,255,.1)">📐</div><span class="cert-issuer">MathWorks</span></div>
+      <div class="cert-issuer-row"><div class="cert-logo">MW</div><span class="cert-issuer">MathWorks</span></div>
       <div class="cert-name">MATLAB Onramp</div>
       <div class="cert-date">Oct 2025</div>
-      <div class="cert-skills"><span class="cert-skill">MATLAB</span><span class="cert-skill">Machine Learning</span></div>
+      <div class="cert-skills"><span class="cert-skill">MATLAB</span><span class="cert-skill">ML</span></div>
     </div>
-
     <div class="cert-card reveal stagger-5" style="--cc:var(--yellow)">
-      <div class="cert-issuer-row"><div class="cert-logo" style="background:rgba(255,153,0,.1)">☁️</div><span class="cert-issuer">Amazon Web Services (AWS)</span></div>
+      <div class="cert-issuer-row"><div class="cert-logo">AWS</div><span class="cert-issuer">Amazon Web Services</span></div>
       <div class="cert-name">AWS SimuLearn: Cloud Practitioner</div>
       <div class="cert-date">Oct 2025</div>
-      <div class="cert-skills"><span class="cert-skill">Amazon VPC</span><span class="cert-skill">Lambda</span><span class="cert-skill">Load Balancing</span><span class="cert-skill">AWS IAM</span></div>
+      <div class="cert-skills"><span class="cert-skill">VPC</span><span class="cert-skill">Lambda</span><span class="cert-skill">IAM</span></div>
     </div>
-
     <div class="cert-card reveal stagger-6" style="--cc:var(--yellow)">
-      <div class="cert-issuer-row"><div class="cert-logo" style="background:rgba(255,153,0,.1)">🌐</div><span class="cert-issuer">Amazon Web Services (AWS)</span></div>
+      <div class="cert-issuer-row"><div class="cert-logo">AWS</div><span class="cert-issuer">Amazon Web Services</span></div>
       <div class="cert-name">AWS SimuLearn: Cloud Computing Essentials</div>
       <div class="cert-date">Aug 2025</div>
       <div class="cert-skills"><span class="cert-skill">AWS IAM</span></div>
     </div>
-
-    <div class="cert-card reveal stagger-1" style="--cc:var(--blue)">
-      <div class="cert-issuer-row"><div class="cert-logo" style="background:rgba(10,102,194,.15)">in</div><span class="cert-issuer">LinkedIn Learning</span></div>
+    <div class="cert-card reveal stagger-1" style="--cc:var(--purple)">
+      <div class="cert-issuer-row"><div class="cert-logo">in</div><span class="cert-issuer">LinkedIn Learning</span></div>
       <div class="cert-name">Agentic AI Fundamentals: Architectures, Frameworks &amp; Applications</div>
       <div class="cert-date">Oct 2025</div>
-      <div class="cert-skills"><span class="cert-skill">AI Agents</span><span class="cert-skill">AI for Business</span><span class="cert-skill">Artificial Intelligence</span></div>
+      <div class="cert-skills"><span class="cert-skill">AI Agents</span><span class="cert-skill">AI</span></div>
     </div>
-
     <div class="cert-card reveal stagger-2" style="--cc:var(--green)">
-      <div class="cert-issuer-row"><div class="cert-logo" style="background:rgba(10,102,194,.15)">in</div><span class="cert-issuer">LinkedIn Learning</span></div>
+      <div class="cert-issuer-row"><div class="cert-logo">in</div><span class="cert-issuer">LinkedIn Learning</span></div>
       <div class="cert-name">Choosing a Cloud Platform: AWS, Azure, and GCP</div>
       <div class="cert-date">Oct 2025</div>
-      <div class="cert-skills"><span class="cert-skill">AWS</span><span class="cert-skill">GCP</span><span class="cert-skill">Microsoft Azure</span><span class="cert-skill">Cloud Dev</span></div>
+      <div class="cert-skills"><span class="cert-skill">AWS</span><span class="cert-skill">GCP</span><span class="cert-skill">Azure</span></div>
     </div>
-
     <div class="cert-card reveal stagger-3" style="--cc:var(--green)">
-      <div class="cert-issuer-row"><div class="cert-logo" style="background:rgba(10,102,194,.15)">in</div><span class="cert-issuer">LinkedIn Learning</span></div>
+      <div class="cert-issuer-row"><div class="cert-logo">in</div><span class="cert-issuer">LinkedIn Learning</span></div>
       <div class="cert-name">Cloud Computing: Understanding Networking</div>
       <div class="cert-date">Oct 2025</div>
-      <div class="cert-skills"><span class="cert-skill">Network Administration</span><span class="cert-skill">Computer Networking</span></div>
+      <div class="cert-skills"><span class="cert-skill">Networking</span></div>
     </div>
-
     <div class="cert-card reveal stagger-4" style="--cc:var(--purple)">
-      <div class="cert-issuer-row"><div class="cert-logo" style="background:rgba(10,102,194,.15)">in</div><span class="cert-issuer">LinkedIn Learning</span></div>
+      <div class="cert-issuer-row"><div class="cert-logo">in</div><span class="cert-issuer">LinkedIn Learning</span></div>
       <div class="cert-name">Cloud Architecture: Core Concepts</div>
       <div class="cert-date">Oct 2025</div>
-      <div class="cert-skills"><span class="cert-skill">Cloud Security</span><span class="cert-skill">Cloud Computing</span></div>
+      <div class="cert-skills"><span class="cert-skill">Cloud Security</span></div>
     </div>
-
     <div class="cert-card reveal stagger-5" style="--cc:var(--purple)">
-      <div class="cert-issuer-row"><div class="cert-logo" style="background:rgba(10,102,194,.15)">in</div><span class="cert-issuer">LinkedIn Learning</span></div>
+      <div class="cert-issuer-row"><div class="cert-logo">in</div><span class="cert-issuer">LinkedIn Learning</span></div>
       <div class="cert-name">Introduction to Cloud Computing for IT Pros</div>
       <div class="cert-date">Oct 2025</div>
       <div class="cert-skills"><span class="cert-skill">Cloud Computing</span></div>
     </div>
-
-    <div class="cert-card reveal stagger-6" style="--cc:var(--green);border-style:dashed;opacity:.5">
-      <div class="cert-issuer-row"><div class="cert-logo" style="background:rgba(0,255,170,.06)">+</div><span class="cert-issuer">More coming soon</span></div>
-      <div class="cert-name">Currently studying for AWS Solutions Architect</div>
-      <div class="cert-date">In progress</div>
-    </div>
-
   </div>
-  <div style="margin-top:32px;text-align:center">
-    <a href="https://www.linkedin.com/in/tarun-ramasamy-tamilselvan-a5b412225/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;font-family:var(--fm);font-size:.78rem;color:var(--blue);text-decoration:none;border:1px solid rgba(79,158,255,.2);padding:10px 20px;border-radius:10px;transition:all .2s;background:rgba(79,158,255,.05)">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-      View full profile on LinkedIn
+  <div class="cert-cta reveal">
+    <a href="https://www.linkedin.com/in/tarun-ramasamy-tamilselvan-a5b412225/" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      View full profile on LinkedIn →
     </a>
   </div>
 </section>
 
-<section id="process" class="proc-section">
-  <div class="reveal"><div class="eyebrow">How I Work</div><h2 class="sec-title">My ML <em>Process</em></h2></div>
-  <div class="proc-list reveal">
-    <div class="proc-row"><div class="pstep">01</div><div class="pname">Problem Framing</div><div class="pdesc-t">Define the ML problem type, success metrics, and data requirements before writing a line of code.</div><div class="picon">🎯</div></div>
-    <div class="proc-row"><div class="pstep">02</div><div class="pname">Data &amp; EDA</div><div class="pdesc-t">Gather, clean, and explore datasets — understanding distributions, correlations, and potential biases.</div><div class="picon">📊</div></div>
-    <div class="proc-row"><div class="pstep">03</div><div class="pname">Model Development</div><div class="pdesc-t">Experiment with architectures, hyperparameter tuning, and cross-validation to find the best model.</div><div class="picon">🧠</div></div>
-    <div class="proc-row"><div class="pstep">04</div><div class="pname">Cloud Deployment</div><div class="pdesc-t">Containerise with Docker and deploy to AWS, Azure, or GCP with auto-scaling and CI/CD.</div><div class="picon">☁️</div></div>
-    <div class="proc-row"><div class="pstep">05</div><div class="pname">Monitor &amp; Iterate</div><div class="pdesc-t">Track model drift and retrain on new data to keep production models sharp.</div><div class="picon">🔁</div></div>
-  </div>
-</section>
-
-<section id="contact" class="cta-section">
+<section id="contact" class="cta">
   <div class="cta-eye">Open to opportunities</div>
   <h2>Let's build something<br>intelligent together.</h2>
   <p>Internships, collaborations, and AI/Cloud projects — I'm all ears.</p>
-  <a href="#" onclick="window.location.href='ma'+'il'+'to:'+atob('VGFydW5ydEBob3RtYWlsLmNvbQ==');return false;" class="btn-cta" id="cta-btn">
-    Tarunrt@hotmail.com
+  <a href="#" onclick="window.location.href='ma'+'il'+'to:'+atob('VGFydW5ydEBob3RtYWlsLmNvbQ==');return false;" class="btn-cta">
+    <span class="__cf_email__" data-cfemail="34605546415a4640745c5b4059555d581a575b59">[email&#160;protected]</span>
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.5 8h11M9 4l4.5 4L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </a>
 </section>
@@ -577,204 +503,164 @@ footer{padding:28px 64px;border-top:1px solid var(--border);display:flex;align-i
     <li><a href="https://www.kaggle.com/tarun2135445" target="_blank" rel="noopener">Kaggle</a></li>
     <li><a href="#" onclick="window.location.href='ma'+'il'+'to:'+atob('VGFydW5ydEBob3RtYWlsLmNvbQ==');return false;">Email</a></li>
   </ul>
-  <p class="fcopy">© 2025 Tarun Ramasamy Tamilselvan</p>
+  <p class="fcopy">© 2026 Tarun Ramasamy Tamilselvan</p>
 </footer>
 
-<script>
-// ── WEBGL SHADER BACKGROUND (chromatic scanline) ──
+<!-- TWEAKS PANEL -->
+<div id="tw-panel" role="dialog" aria-label="Tweaks">
+  <div class="tw-hd"><b>Tweaks</b><button class="tw-x" id="tw-close" aria-label="Close">×</button></div>
+  <div class="tw-row">
+    <div class="tw-lbl"><span>Vibe</span><em data-vibe-label>aurora</em></div>
+    <div class="tw-seg" data-tw="vibe">
+      <button data-v="cyber">cyber</button><button data-v="aurora">aurora</button><button data-v="sunset">sunset</button>
+    </div>
+  </div>
+  <div class="tw-row">
+    <div class="tw-lbl"><span>Energy</span><em data-energy-label>electric</em></div>
+    <div class="tw-seg" data-tw="energy">
+      <button data-v="calm">calm</button><button data-v="live">live</button><button data-v="electric">electric</button>
+    </div>
+  </div>
+  <div class="tw-row">
+    <div class="tw-lbl"><span>Type Mode</span><em data-typemode-label>hybrid</em></div>
+    <div class="tw-seg" data-tw="typemode">
+      <button data-v="hybrid">hybrid</button><button data-v="mono">mono</button><button data-v="display">display</button>
+    </div>
+  </div>
+  <div class="tw-foot">// reshape the feel — combine freely</div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// Stars
 (function(){
-  function start(){
-    if(!window.THREE){ return setTimeout(start, 60); }
-    var canvas = document.getElementById('bg-canvas');
-    if(!canvas) return;
+  var s=document.getElementById('stars');if(!s)return;
+  var n=window.innerWidth<700?28:60;
+  for(var i=0;i<n;i++){
+    var el=document.createElement('i');
+    el.style.left=(Math.random()*100)+'%';
+    el.style.top=(Math.random()*100)+'%';
+    el.style.animationDelay=(Math.random()*4)+'s';
+    el.style.animationDuration=(2.5+Math.random()*4)+'s';
+    s.appendChild(el);
+  }
+})();
 
-    var vertexShader = [
-      'attribute vec3 position;',
-      'void main(){ gl_Position = vec4(position, 1.0); }'
-    ].join('\n');
+// Mouse spotlight
+(function(){
+  var sp=document.getElementById('spotlight');if(!sp)return;
+  var mx=50,my=50,tx=50,ty=50,raf;
+  function tick(){
+    mx+=(tx-mx)*.08;my+=(ty-my)*.08;
+    sp.style.setProperty('--mx',mx+'%');sp.style.setProperty('--my',my+'%');
+    if(Math.abs(tx-mx)>.1||Math.abs(ty-my)>.1)raf=requestAnimationFrame(tick);else raf=null;
+  }
+  window.addEventListener('mousemove',function(e){
+    tx=(e.clientX/window.innerWidth)*100;ty=(e.clientY/window.innerHeight)*100;
+    if(!raf)raf=requestAnimationFrame(tick);
+  },{passive:true});
+})();
 
-    var fragmentShader = [
-      'precision highp float;',
-      'uniform vec2 resolution;',
-      'uniform float time;',
-      'uniform float xScale;',
-      'uniform float yScale;',
-      'uniform float distortion;',
-      'void main(){',
-      '  vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);',
-      '  float d = length(p) * distortion;',
-      '  float rx = p.x * (1.0 + d);',
-      '  float gx = p.x;',
-      '  float bx = p.x * (1.0 - d);',
-      '  float r = 0.05 / abs(p.y + sin((rx + time) * xScale) * yScale);',
-      '  float g = 0.05 / abs(p.y + sin((gx + time) * xScale) * yScale);',
-      '  float b = 0.05 / abs(p.y + sin((bx + time) * xScale) * yScale);',
-      '  gl_FragColor = vec4(r, g, b, 1.0);',
-      '}'
-    ].join('\n');
-
-    var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: false });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x000000, 1);
-
-    var scene = new THREE.Scene();
-    var camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, -1);
-
-    var uniforms = {
-      resolution: { value: new THREE.Vector2(1, 1) },
-      time:       { value: 0.0 },
-      xScale:     { value: 1.0 },
-      yScale:     { value: 0.5 },
-      distortion: { value: 0.05 }
-    };
-
-    var positions = new Float32Array([
-      -1,-1, 0,  1,-1, 0,  -1, 1, 0,
-       1,-1, 0, -1, 1, 0,   1, 1, 0
-    ]);
-    var geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-    var material = new THREE.RawShaderMaterial({
-      vertexShader: vertexShader,
-      fragmentShader: fragmentShader,
-      uniforms: uniforms,
-      side: THREE.DoubleSide
+// Skill card light follow
+(function(){
+  document.querySelectorAll('.sk').forEach(function(c){
+    c.addEventListener('mousemove',function(e){
+      var r=c.getBoundingClientRect();
+      c.style.setProperty('--sx',((e.clientX-r.left)/r.width*100)+'%');
+      c.style.setProperty('--sy',((e.clientY-r.top)/r.height*100)+'%');
     });
-
-    scene.add(new THREE.Mesh(geometry, material));
-
-    function resize(){
-      var w = window.innerWidth, h = window.innerHeight;
-      renderer.setSize(w, h, false);
-      uniforms.resolution.value.set(w, h);
-    }
-
-    function tick(){
-      uniforms.time.value += 0.01;
-      renderer.render(scene, camera);
-      requestAnimationFrame(tick);
-    }
-
-    resize();
-    tick();
-    window.addEventListener('resize', resize);
-  }
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', start);
-  } else {
-    start();
-  }
-})();
-
-// Cursor
-var cur=document.getElementById('cur'),curR=document.getElementById('curR');
-var rx=0,ry=0,mx=window.innerWidth/2,my=window.innerHeight/2;
-document.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
-(function loop(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;curR.style.left=rx+'px';curR.style.top=ry+'px';requestAnimationFrame(loop);})();
-
-// Progress bar
-window.addEventListener('scroll',function(){
-  var s=document.documentElement.scrollTop;
-  var h=document.documentElement.scrollHeight-document.documentElement.clientHeight;
-  document.getElementById('progress-bar').style.width=(s/h*100)+'%';
-  document.getElementById('navbar').classList.toggle('scrolled',s>50);
-});
-
-// Scroll expand media
-(function(){
-  var section=document.querySelector('.scroll-expand');
-  if(!section) return;
-  var frame=section.querySelector('[data-scroll-frame]');
-  var bg=section.querySelector('[data-scroll-bg]');
-  var overlay=section.querySelector('[data-scroll-overlay]');
-  var date=section.querySelector('[data-scroll-date]');
-  var hint=section.querySelector('[data-scroll-hint]');
-  var titleLeft=section.querySelector('[data-scroll-title-left]');
-  var titleRight=section.querySelector('[data-scroll-title-right]');
-  var content=section.querySelector('[data-scroll-content]');
-  var reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
-  var ticking=false;
-
-  function clamp(value,min,max){return Math.min(Math.max(value,min),max);}
-  function ease(value){return value<.5?2*value*value:1-Math.pow(-2*value+2,2)/2;}
-
-  function updateScrollExpand(){
-    ticking=false;
-    var progress=1;
-
-    if(!reduceMotion.matches){
-      var rect=section.getBoundingClientRect();
-      var travel=Math.max(section.offsetHeight-window.innerHeight,1);
-      progress=clamp(-rect.top/travel,0,1);
-    }
-
-    var eased=ease(progress);
-    var isMobile=window.innerWidth<768;
-    var mediaWidth=300+eased*(isMobile?650:1250);
-    var mediaHeight=400+eased*(isMobile?200:400);
-    var textTranslateX=eased*(isMobile?180:150);
-    var contentProgress=clamp((progress-.72)/.18,0,1);
-
-    frame.style.width=mediaWidth+'px';
-    frame.style.height=mediaHeight+'px';
-    bg.style.opacity=(1-progress).toFixed(3);
-    overlay.style.opacity=(.52-progress*.32).toFixed(3);
-    titleLeft.style.transform='translateX(-'+textTranslateX+'vw)';
-    titleRight.style.transform='translateX('+textTranslateX+'vw)';
-    date.style.transform='translateX(-'+textTranslateX+'vw)';
-    hint.style.transform='translateX('+textTranslateX+'vw)';
-    date.style.opacity=(1-clamp((progress-.4)/.35,0,1)).toFixed(3);
-    hint.style.opacity=(1-clamp((progress-.4)/.35,0,1)).toFixed(3);
-    content.style.opacity=contentProgress.toFixed(3);
-    content.style.transform='translate(-50%,'+(24-contentProgress*24)+'px)';
-    section.classList.toggle('is-content-visible',contentProgress>.8);
-  }
-
-  function requestUpdate(){
-    if(ticking) return;
-    ticking=true;
-    requestAnimationFrame(updateScrollExpand);
-  }
-
-  updateScrollExpand();
-  window.addEventListener('scroll',requestUpdate,{passive:true});
-  window.addEventListener('resize',requestUpdate);
-  if(reduceMotion.addEventListener){
-    reduceMotion.addEventListener('change',requestUpdate);
-  }
-})();
-
-// Scroll reveal
-var obs=new IntersectionObserver(function(entries){
-  entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');}});
-},{threshold:0.08});
-document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.reveal-scale').forEach(function(el){
-  obs.observe(el);
-});
-
-// Skill card mouse glow
-document.querySelectorAll('.sk').forEach(function(card){
-  card.addEventListener('mousemove',function(e){
-    var r=card.getBoundingClientRect();
-    card.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');
-    card.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');
   });
-});
+})();
 
-// Floating particles
-var pc=document.getElementById('particles');
-for(var i=0;i<18;i++){
-  var p=document.createElement('div');
-  p.className='particle';
-  p.style.left=Math.random()*100+'%';
-  p.style.animationDuration=(8+Math.random()*14)+'s';
-  p.style.animationDelay=(Math.random()*10)+'s';
-  p.style.width=p.style.height=(1+Math.random()*2)+'px';
-  p.style.opacity=Math.random()*0.4;
-  pc.appendChild(p);
-}
+// Progress bar + parallax + nav scrolled state
+(function(){
+  var bar=document.getElementById('progress-bar');
+  var nav=document.querySelector('nav');
+  var blobs=document.querySelectorAll('.mesh .blob');
+  var hero=document.querySelector('.hero');
+  var ticking=false;
+  function update(){
+    var s=window.scrollY;
+    var h=document.documentElement.scrollHeight-document.documentElement.clientHeight;
+    bar.style.width=(s/h*100)+'%';
+    if(nav)nav.classList.toggle('scrolled',s>30);
+    // Parallax blobs
+    if(blobs[0])blobs[0].style.transform='translate3d(0,'+(s*.15)+'px,0)';
+    if(blobs[1])blobs[1].style.transform='translate3d(0,'+(s*-.1)+'px,0)';
+    if(blobs[2])blobs[2].style.transform='translate3d(0,'+(s*.08)+'px,0)';
+    // Hero fade as you scroll
+    if(hero&&s<window.innerHeight){
+      var p=Math.min(s/window.innerHeight,1);
+      hero.style.opacity=1-p*.6;
+      hero.style.transform='translateY('+(p*40)+'px)';
+    }
+    ticking=false;
+  }
+  window.addEventListener('scroll',function(){
+    if(!ticking){requestAnimationFrame(update);ticking=true;}
+  },{passive:true});
+  update();
 
+  // Reveal observer
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}
+    });
+  },{threshold:.08,rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
+})();
+
+// Magnetic buttons
+(function(){
+  if(window.matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  document.querySelectorAll('.btn,.btn-cta').forEach(function(b){
+    b.addEventListener('mousemove',function(e){
+      var r=b.getBoundingClientRect();
+      var x=e.clientX-r.left-r.width/2;
+      var y=e.clientY-r.top-r.height/2;
+      b.style.transform='translate('+(x*.18)+'px,'+(y*.25-2)+'px)';
+    });
+    b.addEventListener('mouseleave',function(){b.style.transform=''});
+  });
+})();
+
+// Tweaks panel
+(function(){
+  var TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "vibe": "cyber",
+    "energy": "live",
+    "typemode": "hybrid"
+  }/*EDITMODE-END*/;
+  var state=Object.assign({},TWEAK_DEFAULTS);
+  var panel=document.getElementById('tw-panel');
+  var body=document.body;
+  function apply(){
+    body.setAttribute('data-vibe',state.vibe);
+    body.setAttribute('data-energy',state.energy);
+    body.setAttribute('data-typemode',state.typemode);
+    document.querySelectorAll('[data-tw]').forEach(function(g){
+      var k=g.getAttribute('data-tw');
+      g.querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-v')===state[k])});
+    });
+    var l1=document.querySelector('[data-vibe-label]');if(l1)l1.textContent=state.vibe;
+    var l2=document.querySelector('[data-energy-label]');if(l2)l2.textContent=state.energy;
+    var l3=document.querySelector('[data-typemode-label]');if(l3)l3.textContent=state.typemode;
+  }
+  function setKey(k,v){state[k]=v;apply();try{window.parent.postMessage({type:'__edit_mode_set_keys',edits:{[k]:v}},'*')}catch(_){}}
+  apply();
+  document.querySelectorAll('[data-tw] button').forEach(function(b){
+    b.addEventListener('click',function(){setKey(b.parentElement.getAttribute('data-tw'),b.getAttribute('data-v'))});
+  });
+  document.getElementById('tw-close').addEventListener('click',function(){
+    panel.classList.remove('tw-on');
+    try{window.parent.postMessage({type:'__edit_mode_dismissed'},'*')}catch(_){}
+  });
+  window.addEventListener('message',function(e){
+    var d=e&&e.data;if(!d||!d.type)return;
+    if(d.type==='__activate_edit_mode')panel.classList.add('tw-on');
+    else if(d.type==='__deactivate_edit_mode')panel.classList.remove('tw-on');
+  });
+  try{window.parent.postMessage({type:'__edit_mode_available'},'*')}catch(_){}
+})();
 </script>
 </body>
 </html>
